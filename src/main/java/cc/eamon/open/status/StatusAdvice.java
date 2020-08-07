@@ -20,20 +20,19 @@ public abstract class StatusAdvice {
     @ResponseBody
     public Map<String, Object> statusExceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
         logger.error(e.getMessage());
-        Status status;
+        Status.Builder builder;
         if (e instanceof StatusException) {
             StatusException exception = (StatusException) e;
             response.setStatus(exception.getCode());
-            status = Status.buildStatus(false, exception.getCode(), exception.getMessage());
-        }else if (e instanceof RuntimeException){
-            RuntimeException exception = (RuntimeException) e;
+            builder = Status.failedBuilder(exception);
+        } else if (e instanceof RuntimeException) {
             response.setStatus(700);
-            status = Status.buildStatus(false, 700, exception.getMessage());
-        }else {
-            status = Status.buildFailedStatus();
+            builder = Status.failedBuilder().addMessage(e.getMessage());
+        } else {
+            builder = Status.failedBuilder();
         }
-        status.setPath(request.getRequestURI());
-        return status.buildMap();
+        builder.addPath(request.getRequestURI());
+        return builder.map();
     }
 
 
