@@ -135,19 +135,19 @@ public class Status {
     }
 
     public static Builder failedBuilder() {
-        return new Builder(true, StatusCode.getCode(700), StatusCode.getMessage(700));
+        return new Builder(false, StatusCode.getCode(700), StatusCode.getMessage(700));
     }
 
     public static Builder failedBuilder(int code) {
-        return new Builder(true, StatusCode.getCode(code), StatusCode.getMessage(code));
+        return new Builder(false, StatusCode.getCode(code), StatusCode.getMessage(code));
     }
 
     public static Builder failedBuilder(String errorName) {
-        return new Builder(true, StatusCode.getCode(errorName), StatusCode.getMessage(errorName));
+        return new Builder(false, StatusCode.getCode(errorName), StatusCode.getMessage(errorName));
     }
 
     public static Builder failedBuilder(StatusException statusException) {
-        return new Builder(true, statusException.getCode(), statusException.getMessage());
+        return new Builder(false, statusException.getCode(), statusException.getMessage());
     }
 
     public static class Builder {

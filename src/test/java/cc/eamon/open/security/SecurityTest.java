@@ -67,5 +67,4 @@ public class SecurityTest {
         Assert.isTrue((new String(decode, StandardCharsets.UTF_8)).equals(testString), "不匹配");
     }
 
-
 }

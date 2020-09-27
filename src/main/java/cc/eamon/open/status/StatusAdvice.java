@@ -23,17 +23,19 @@ public abstract class StatusAdvice {
         Status.Builder builder;
         if (e instanceof StatusException) {
             StatusException exception = (StatusException) e;
-            response.setStatus(exception.getCode());
+            if (setResponseStatus()) response.setStatus(exception.getCode());
             builder = Status.failedBuilder(exception);
         } else if (e instanceof RuntimeException) {
-            response.setStatus(700);
-            builder = Status.failedBuilder().addMessage(e.getMessage());
+            if (setResponseStatus()) response.setStatus(700);
+            builder = Status.failedBuilder().addMessage("[Runtime]" + e.getMessage());
         } else {
-            builder = Status.failedBuilder();
+            if (setResponseStatus()) response.setStatus(700);
+            builder = Status.failedBuilder().addMessage(e.getMessage());
         }
         builder.addPath(request.getRequestURI());
         return builder.map();
     }
 
+    public abstract boolean setResponseStatus();
 
 }

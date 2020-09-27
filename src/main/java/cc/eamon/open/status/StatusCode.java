@@ -28,11 +28,21 @@ public class StatusCode {
     /**
      * 请求失败
      */
-    public static int FAILED = 701;
+    public static int FAILED = 700;
     /**
      * 简单请求失败消息
      */
     public static String FAILED_MSG = "请求失败";
+
+    /**
+     * 权限不足
+     */
+    public static int NO_AUTH = 800;
+
+    /**
+     * 简单权限不足消息
+     */
+    public static String NO_AUTH_MSG = "权限不足";
 
     /**
      * 错误未识别
@@ -67,11 +77,11 @@ public class StatusCode {
         try {
             prop.load(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
             prop.stringPropertyNames().forEach((e) -> {
-                String cm[] = prop.getProperty(e).split(",");
+                String cm[] = prop.getProperty(e).split("::");
                 Assert.isTrue(cm.length >= 2, "status.properties 加载错误");
 
                 StatusCode code = new StatusCode();
-                code.code = Integer.parseInt(cm[0]);
+                code.code = Integer.parseInt(cm[0].trim());
                 code.msg = cm[1].trim();
 
                 switch (e) {
@@ -83,6 +93,9 @@ public class StatusCode {
                         FAILED = code.code;
                         FAILED_MSG = code.msg;
                         break;
+                    case "NO_AUTH":
+                        NO_AUTH = code.code;
+                        NO_AUTH_MSG = code.msg;
                     case "NO_RECOGNIZE":
                         NO_RECOGNIZE = code.code;
                         NO_RECOGNIZE_MSG = code.msg;
