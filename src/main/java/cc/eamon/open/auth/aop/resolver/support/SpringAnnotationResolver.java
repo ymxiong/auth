@@ -1,5 +1,6 @@
-package cc.eamon.open.auth.aop.resolver;
+package cc.eamon.open.auth.aop.resolver.support;
 
+import cc.eamon.open.auth.aop.resolver.AnnotationResolver;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;

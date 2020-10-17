@@ -1,6 +1,6 @@
 package cc.eamon.open.auth.aop.handler;
 
-import cc.eamon.open.status.StatusException;
+import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.annotation.Annotation;
 
@@ -9,27 +9,11 @@ import java.lang.annotation.Annotation;
  * Email: eamon@eamon.cc
  * Time: 2020-08-10 18:53:30
  */
-public abstract class AnnotationHandler {
+public interface AnnotationHandler {
 
-    private Class<? extends Annotation> annotationClass;
+    void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation);
 
-    public AnnotationHandler(Class<? extends Annotation> annotationClass) {
-        this.setAnnotationClass(annotationClass);
-    }
+    Class<? extends Annotation> getAnnotationClass();
 
-    private void setAnnotationClass(Class<? extends Annotation> annotationClass) throws IllegalArgumentException {
-        if (annotationClass == null) {
-            String msg = "annotationClass argument cannot be null";
-            throw new IllegalArgumentException(msg);
-        } else {
-            this.annotationClass = annotationClass;
-        }
-    }
-
-    public Class<? extends Annotation> getAnnotationClass() {
-        return this.annotationClass;
-    }
-
-    public abstract void assertAuthorized(Annotation annotation) throws StatusException;
 }
 

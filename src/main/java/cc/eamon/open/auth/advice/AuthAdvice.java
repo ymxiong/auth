@@ -1,7 +1,8 @@
 package cc.eamon.open.auth.advice;
 
 import cc.eamon.open.auth.Auth;
-import cc.eamon.open.auth.aop.proxy.support.AopInterceptorProxy;
+import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
+import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.core.annotation.AnnotationUtils;
 
@@ -13,26 +14,25 @@ import java.lang.reflect.Method;
  * Email: eamon@eamon.cc
  * Time: 2020-08-14 21:53:40
  */
-public class AuthAdvice extends StaticMethodMatcherPointcutAdvisor {
+public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor implements Authenticator {
 
     public AuthAdvice() {
-        this.setAdvice(new AopInterceptorProxy());
+        this.setAdvice(new AuthMethodInterceptorProxy(this));
     }
 
     @Override
     public boolean matches(Method method, Class<?> aClass) {
-        Method m = method;
-        if (this.isAnnotationPresent(method)) {
-            return true;
-        } else {
-            if (aClass != null) {
-                try {
-                    m = aClass.getMethod(m.getName(), m.getParameterTypes());
-                    return this.isAnnotationPresent(m) || this.isAnnotationPresent(aClass);
-                } catch (NoSuchMethodException e) {
-                    return false;
-                }
-            }
+        return isAnnotationPresent(method, aClass);
+    }
+
+    private boolean isAnnotationPresent(Method method, Class<?> aClass) {
+        if (this.isAnnotationPresent(method)) return true;
+        if (aClass == null) return false;
+        try {
+            Method matchedMethod = method;
+            matchedMethod = aClass.getMethod(matchedMethod.getName(), matchedMethod.getParameterTypes());
+            return this.isAnnotationPresent(matchedMethod) || this.isAnnotationPresent(aClass);
+        } catch (NoSuchMethodException e) {
             return false;
         }
     }
@@ -46,5 +46,7 @@ public class AuthAdvice extends StaticMethodMatcherPointcutAdvisor {
         Annotation a = AnnotationUtils.findAnnotation(method, Auth.class);
         return a != null;
     }
+
 }
+
 

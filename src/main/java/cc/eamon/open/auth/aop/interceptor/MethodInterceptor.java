@@ -1,7 +1,6 @@
 package cc.eamon.open.auth.aop.interceptor;
 
 
-import cc.eamon.open.status.StatusException;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
@@ -13,6 +12,6 @@ public interface MethodInterceptor {
 
     Object invoke(MethodInvocation invocation) throws Throwable;
 
-    void assertAuthorized(MethodInvocation methodInvocation) throws StatusException;
+    void assertAuthorized(MethodInvocation methodInvocation);
 
 }
