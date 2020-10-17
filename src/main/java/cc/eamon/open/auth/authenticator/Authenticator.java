@@ -12,6 +12,6 @@ public interface Authenticator {
 
     boolean open();
 
-    boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String... permission);
+    boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String value, String group);
 
 }

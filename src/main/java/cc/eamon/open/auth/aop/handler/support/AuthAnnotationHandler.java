@@ -2,11 +2,13 @@ package cc.eamon.open.auth.aop.handler.support;
 
 
 import cc.eamon.open.auth.Auth;
+import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.handler.BaseAnnotationHandler;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
 import cc.eamon.open.error.Assert;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -36,31 +38,26 @@ public class AuthAnnotationHandler extends BaseAnnotationHandler {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
 
-        Assert.isTrue(authenticator.checkPermissions(request, response, authAnnotation.value()), "NO_AUTH");
+        String value = authAnnotation.value();
+        if (StringUtils.isEmpty(value)) {
+            value = request.getRequestURI();
+        }
 
-//        Subject subject = this.getSubject();
-//        if (perms.length == 1) {
-//            subject.checkPermission(perms[0]);
-//        } else if (Logical.AND.equals(rpAnnotation.logical())) {
-//            this.getSubject().checkPermissions(perms);
-//        } else {
-//            if (Logical.OR == rpAnnotation.logical()) {
-//                boolean hasAtLeastOnePermission = false;
-//                String[] var6 = perms;
-//                int var7 = perms.length;
-//
-//                for(int var8 = 0; var8 < var7; ++var8) {
-//                    String permission = var6[var8];
-//                    if (this.getSubject().isPermitted(permission)) {
-//                        hasAtLeastOnePermission = true;
-//                    }
-//                }
-//
-//                if (!hasAtLeastOnePermission) {
-//                    this.getSubject().checkPermission(perms[0]);
-//                }
-//            }
-//        }
+        String[] groups = authAnnotation.group();
+        Logical[] logicalList = authAnnotation.logical();
+
+        boolean result = authenticator.checkPermissions(request, response, value, groups[0]);
+        if (groups.length > 1) {
+            for (int i = 1; i < groups.length; i++) {
+                Logical logical = logicalList[0];
+                if (logicalList.length > i - 1 && logicalList[i - 1] != null) logical = logicalList[i - 1];
+                if (logical == Logical.AND)
+                    result = result && authenticator.checkPermissions(request, response, value, groups[i]);
+                if (logical == Logical.OR)
+                    result = result || authenticator.checkPermissions(request, response, value, groups[i]);
+            }
+        }
+        Assert.isTrue(result, "NO_AUTH");
     }
 }
 

@@ -18,7 +18,8 @@ public class DefaultAuthenticator implements Authenticator {
     }
 
     @Override
-    public boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String... permission) {
-        return false;
+    public boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String value, String group) {
+        return true;
     }
+
 }

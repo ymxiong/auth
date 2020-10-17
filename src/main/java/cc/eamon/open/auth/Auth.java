@@ -26,7 +26,7 @@ public @interface Auth {
      * 用于分组拦截确认权限
      * @return 权限集合
      */
-    String[] group() default {};
+    String[] group() default "";
 
     /**
      * 鉴权规则
