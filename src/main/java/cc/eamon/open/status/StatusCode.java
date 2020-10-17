@@ -37,7 +37,7 @@ public class StatusCode {
     /**
      * 权限不足
      */
-    public static int NO_AUTH = 800;
+    public static int NO_AUTH = 401;
 
     /**
      * 简单权限不足消息
