@@ -22,4 +22,14 @@ public class DefaultAuthenticator implements Authenticator {
         return true;
     }
 
+    @Override
+    public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
+        return null;
+    }
+
+    @Override
+    public Object getRequestValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
+        return null;
+    }
+
 }

@@ -14,4 +14,8 @@ public interface Authenticator {
 
     boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String value, String group);
 
+    Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName);
+
+    Object getRequestValue(HttpServletRequest request, HttpServletResponse response, String valueName);
+
 }

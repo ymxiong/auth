@@ -45,6 +45,14 @@ public class AuthAnnotationHandler extends BaseAnnotationHandler {
 
         String[] groups = authAnnotation.group();
         Logical[] logicalList = authAnnotation.logical();
+        // TODO:
+        // 0. 获取表达式
+        String exp = authAnnotation.value();
+        // 1. 拿到request参数
+        authenticator.getRequestValue(request, response, "userId");
+        // 2. 拿到header参数
+        authenticator.getRequestValue(request, response, "entityKey");
+        // 3. 校验表达式
 
         boolean result = authenticator.checkPermissions(request, response, value, groups[0]);
         if (groups.length > 1) {
