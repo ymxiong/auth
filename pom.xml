@@ -43,6 +43,7 @@
         <javax-servlet-version>3.1.0</javax-servlet-version>
         <slf4j-version>1.7.25</slf4j-version>
         <junit-version>4.12</junit-version>
+        <aviator-version>5.1.4</aviator-version>
     </properties>
 
     <dependencies>
@@ -90,6 +91,12 @@
             <artifactId>junit</artifactId>
             <version>${junit-version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.aviator</groupId>
+            <artifactId>aviator</artifactId>
+            <version>${aviator-version}</version>
         </dependency>
 
     </dependencies>
