@@ -7,6 +7,7 @@ import cc.eamon.open.auth.aop.handler.BaseAnnotationHandler;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
 import cc.eamon.open.error.Assert;
+import cc.eamon.open.status.StatusException;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import org.aopalliance.intercept.MethodInvocation;
@@ -64,7 +65,7 @@ public class AuthAnnotationHandler extends BaseAnnotationHandler {
                 env.put(a2,contextValue);
                 execute = (Boolean) expression.execute(env);
             }catch (Exception e){
-                Assert.notNull(null,"EXP_ERROR");
+                throw new StatusException("EXP_ERROR");
             }
 
         }
