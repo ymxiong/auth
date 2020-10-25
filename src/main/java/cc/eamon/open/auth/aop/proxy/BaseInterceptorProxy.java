@@ -1,7 +1,7 @@
 package cc.eamon.open.auth.aop.proxy;
 
 
-import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
+import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
@@ -9,6 +9,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Collection;
  */
 public abstract class BaseInterceptorProxy implements MethodInterceptor {
 
-    private Collection<BaseAnnotationMethodInterceptor> methodInterceptors = new ArrayList<>();
+    private Collection<MethodInterceptor> methodInterceptors = new ArrayList<>();
 
     private Authenticator authenticator;
 
@@ -37,7 +38,7 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
     public void assertAuthorized(MethodInvocation methodInvocation) {
         if (CollectionUtils.isEmpty(methodInterceptors)) return;
 
-        for (BaseAnnotationMethodInterceptor interceptor : methodInterceptors) {
+        for (MethodInterceptor interceptor : methodInterceptors) {
             if (interceptor.supports(methodInvocation)) {
                 interceptor.assertAuthorized(methodInvocation);
             }
@@ -45,8 +46,23 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
 
     }
 
-    protected void addMethodInterceptors(Collection<BaseAnnotationMethodInterceptor> methodInterceptors) {
-        this.methodInterceptors.addAll(methodInterceptors);
+    @Override
+    public boolean supports(MethodInvocation methodInvocation) {
+        return true;
     }
+
+    @Override
+    public Logical getLogical() {
+        return Logical.AND;
+    }
+
+    protected void addMethodInterceptors(MethodInterceptor... methodInterceptors) {
+        this.methodInterceptors.addAll(Arrays.asList(methodInterceptors));
+    }
+
+    protected void clearMethodInterceptors() {
+        this.methodInterceptors.clear();
+    }
+
 }
 

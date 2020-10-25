@@ -1,15 +1,13 @@
 package cc.eamon.open.auth.aop.proxy.support;
 
-import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
-import cc.eamon.open.auth.aop.interceptor.support.AuthInterceptor;
+import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.aop.proxy.BaseInterceptorProxy;
-import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 
 /**
  * Author: eamon
@@ -20,13 +18,21 @@ public class AuthMethodInterceptorProxy extends BaseInterceptorProxy implements 
 
     public AuthMethodInterceptorProxy(Authenticator authenticator) {
         super(authenticator);
-        List<BaseAnnotationMethodInterceptor> interceptors = new ArrayList<>();
-        interceptors.add(new AuthInterceptor(new SpringAnnotationResolver()));
-        this.addMethodInterceptors(interceptors);
     }
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
+        this.clearMethodInterceptors();
+
+        cc.eamon.open.auth.aop.interceptor.MethodInterceptor interceptor = null;
+        for (Annotation annotation : invocation.getMethod().getAnnotations()) {
+            AuthEnums authEnum = AuthEnums.getEnumByAnnotationClass(annotation);
+            if (authEnum == null) continue;
+            Constructor constructor = authEnum.getMethodInterceptor().getDeclaredConstructor(cc.eamon.open.auth.aop.interceptor.MethodInterceptor.class);
+            constructor.setAccessible(true);
+            interceptor = (cc.eamon.open.auth.aop.interceptor.MethodInterceptor) constructor.newInstance(interceptor);
+        }
+        this.addMethodInterceptors(interceptor);
         return super.invoke(invocation);
     }
 

@@ -1,9 +1,8 @@
 package cc.eamon.open.auth.aop.interceptor;
 
 
-import cc.eamon.open.auth.aop.handler.AnnotationHandler;
+import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.resolver.AnnotationResolver;
-import cc.eamon.open.auth.aop.resolver.support.DefaultAnnotationResolver;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.annotation.Annotation;
@@ -16,25 +15,32 @@ import java.lang.annotation.Annotation;
 public abstract class BaseAnnotationMethodInterceptor implements MethodInterceptor {
 
     /**
-     * annotation handler
-     * 注解处理
-     */
-    private AnnotationHandler handler;
-
-    /**
      * annotation resolver
      * 注解解析
      */
     private AnnotationResolver resolver;
 
-    public BaseAnnotationMethodInterceptor(AnnotationHandler handler) {
-        this(handler, new DefaultAnnotationResolver());
-    }
+    /**
+     * annotation
+     * 具体注解
+     */
+    private Class<? extends Annotation> annotation;
 
-    public BaseAnnotationMethodInterceptor(AnnotationHandler handler, AnnotationResolver resolver) {
-        if (handler == null) throw new IllegalArgumentException("AnnotationHandler argument cannot be null.");
-        this.handler = handler;
-        this.resolver = resolver != null ? resolver : new DefaultAnnotationResolver();
+    /**
+     * next interceptor
+     * 下一个拦截器
+     */
+    private MethodInterceptor preMethodInterceptor;
+
+    public BaseAnnotationMethodInterceptor(AnnotationResolver resolver, Class<? extends Annotation> annotation, MethodInterceptor preMethodInterceptor) {
+        if (annotation == null) {
+            String msg = "annotation argument cannot be null";
+            throw new IllegalArgumentException(msg);
+        } else {
+            this.annotation = annotation;
+        }
+        this.resolver = resolver;
+        this.preMethodInterceptor = preMethodInterceptor;
     }
 
     @Override
@@ -45,15 +51,33 @@ public abstract class BaseAnnotationMethodInterceptor implements MethodIntercept
 
     @Override
     public void assertAuthorized(MethodInvocation methodInvocation) {
-        handler.assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
+        if (preMethodInterceptor != null) preMethodInterceptor.assertAuthorized(methodInvocation);
+        if (getLogical() == Logical.OR) return;
+        assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
     }
 
+
+    @Override
     public boolean supports(MethodInvocation methodInvocation) {
         return this.getAnnotation(methodInvocation) != null;
     }
 
     private Annotation getAnnotation(MethodInvocation methodInvocation) {
-        return this.resolver.getAnnotation(methodInvocation, this.handler.getAnnotationClass());
+        return this.resolver.getAnnotation(methodInvocation, annotation);
+    }
+
+    public void setResolver(AnnotationResolver resolver) {
+        this.resolver = resolver;
+    }
+
+    public abstract void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation);
+
+    @Override
+    public Logical getLogical() {
+        Logical logical = null;
+        if (preMethodInterceptor != null) logical = preMethodInterceptor.getLogical();
+        if (logical == null) logical = Logical.AND;
+        return logical;
     }
 
 }

@@ -1,6 +1,7 @@
 package cc.eamon.open.auth.aop.interceptor;
 
 
+import cc.eamon.open.auth.Logical;
 import org.aopalliance.intercept.MethodInvocation;
 
 /**
@@ -14,4 +15,7 @@ public interface MethodInterceptor {
 
     void assertAuthorized(MethodInvocation methodInvocation);
 
+    boolean supports(MethodInvocation methodInvocation);
+
+    Logical getLogical();
 }

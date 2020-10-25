@@ -1,12 +1,14 @@
 package cc.eamon.open.auth.advice;
 
-import cc.eamon.open.auth.Auth;
+import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.StringUtils;
 
-import java.lang.annotation.Annotation;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -26,25 +28,45 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     }
 
     private boolean isAnnotationPresent(Method method, Class<?> aClass) {
-        if (this.isAnnotationPresent(method)) return true;
+        if (AuthEnums.isAnnotationPresent(method)) return true;
         if (aClass == null) return false;
         try {
             Method matchedMethod = method;
             matchedMethod = aClass.getMethod(matchedMethod.getName(), matchedMethod.getParameterTypes());
-            return this.isAnnotationPresent(matchedMethod) || this.isAnnotationPresent(aClass);
+            return AuthEnums.isAnnotationPresent(matchedMethod) || AuthEnums.isAnnotationPresent(aClass);
         } catch (NoSuchMethodException e) {
             return false;
         }
     }
 
-    private boolean isAnnotationPresent(Class<?> targetClazz) {
-        Annotation a = AnnotationUtils.findAnnotation(targetClazz, Auth.class);
-        return a != null;
+    @Override
+    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group) {
+        return true;
     }
 
-    private boolean isAnnotationPresent(Method method) {
-        Annotation a = AnnotationUtils.findAnnotation(method, Auth.class);
-        return a != null;
+    @Override
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression) {
+        return true;
+    }
+
+    @Override
+    public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
+        String value = request.getHeader(valueName);
+        if (StringUtils.isEmpty(value)) {
+            Cookie[] cookies = request.getCookies();
+            if (null != cookies) {
+                for (Cookie cookie : cookies) {
+                    if (valueName.equals(cookie.getName())) value = cookie.getValue();
+                }
+            }
+        }
+        return value;
+
+    }
+
+    @Override
+    public Object getRequestValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
+        return request.getParameter(valueName);
     }
 
 }

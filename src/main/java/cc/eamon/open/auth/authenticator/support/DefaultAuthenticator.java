@@ -18,7 +18,12 @@ public class DefaultAuthenticator implements Authenticator {
     }
 
     @Override
-    public boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String value, String group) {
+    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group) {
+        return true;
+    }
+
+    @Override
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression) {
         return true;
     }
 

@@ -12,14 +12,14 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Auth {
+public @interface AuthGroup {
 
     /**
      * 权限名称
      * 用于根据权限名称拦截确认权限
      * @return 权限名称
      */
-    String value() default "";
+    String[] value() default {};
 
     /**
      * 鉴权规则

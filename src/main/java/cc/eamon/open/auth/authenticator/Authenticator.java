@@ -12,7 +12,9 @@ public interface Authenticator {
 
     boolean open();
 
-    boolean checkPermissions(HttpServletRequest request, HttpServletResponse response, String value, String group);
+    boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group);
+
+    boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression);
 
     Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName);
 
