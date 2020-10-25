@@ -3,6 +3,7 @@ package cc.eamon.open.auth.aop.interceptor;
 
 import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.resolver.AnnotationResolver;
+import cc.eamon.open.status.StatusException;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.annotation.Annotation;
@@ -51,8 +52,20 @@ public abstract class BaseAnnotationMethodInterceptor implements MethodIntercept
 
     @Override
     public void assertAuthorized(MethodInvocation methodInvocation) {
-        if (preMethodInterceptor != null) preMethodInterceptor.assertAuthorized(methodInvocation);
-        if (getLogical() == Logical.OR) return;
+        Logical logical = null;
+        if (preMethodInterceptor != null)
+            try {
+                preMethodInterceptor.assertAuthorized(methodInvocation);
+            } catch (StatusException e) {
+                logical = getLogical();
+                if (logical == Logical.OR) {
+                    assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
+                } else {
+                    throw e;
+                }
+            }
+        if (logical == null) logical = getLogical();
+        if (logical == Logical.OR) return;
         assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
     }
 

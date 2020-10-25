@@ -43,7 +43,7 @@ public class AuthInterceptor extends BaseAnnotationMethodInterceptor {
         if (logicalQueue.isEmpty()) {
             return super.getLogical();
         }
-        return logicalQueue.peek();
+        return logicalQueue.poll();
     }
 }
 
