@@ -52,20 +52,18 @@ public abstract class BaseAnnotationMethodInterceptor implements MethodIntercept
 
     @Override
     public void assertAuthorized(MethodInvocation methodInvocation) {
-        Logical logical = null;
         if (preMethodInterceptor != null)
             try {
                 preMethodInterceptor.assertAuthorized(methodInvocation);
             } catch (StatusException e) {
-                logical = getLogical();
-                if (logical == Logical.OR) {
+                if (getLogical() == Logical.OR) {
                     assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
+                    return;
                 } else {
                     throw e;
                 }
             }
-        if (logical == null) logical = getLogical();
-        if (logical == Logical.OR) return;
+        if (getLogical() == Logical.OR) return;
         assertAuthorized(methodInvocation, this.getAnnotation(methodInvocation));
     }
 
