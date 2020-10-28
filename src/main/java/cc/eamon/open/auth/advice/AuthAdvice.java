@@ -4,7 +4,6 @@ import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -52,16 +51,19 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     @Override
     public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
         String value = request.getHeader(valueName);
-        if (StringUtils.isEmpty(value)) {
+        if (valueName.contains("cookie")) {
+            String[] values = valueName.split("\\$");
+            if (values.length < 2) return null;
             Cookie[] cookies = request.getCookies();
             if (null != cookies) {
                 for (Cookie cookie : cookies) {
-                    if (valueName.equals(cookie.getName())) value = cookie.getValue();
+                    if (values[1].equals(cookie.getName())) return cookie.getValue();
                 }
             }
+        }else if (valueName.contains("header")){
+            return value;
         }
         return value;
-
     }
 
     @Override

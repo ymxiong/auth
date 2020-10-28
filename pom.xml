@@ -6,7 +6,7 @@
 
     <groupId>cc.eamon.open</groupId>
     <artifactId>auth</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -100,6 +100,27 @@
         </dependency>
 
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>releases</name>
+            <url>http://central.horsecoder.com:8081/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>snapshots</name>
+            <url>http://central.horsecoder.com:8081/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>releases</id>
+            <name>releases</name>
+            <url>http://central.horsecoder.com:8081/repository/maven-releases/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
