@@ -23,8 +23,8 @@ public class DefaultAuthenticator implements Authenticator {
     }
 
     @Override
-    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression) {
-        return true;
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult) {
+        return expressionResult;
     }
 
     @Override

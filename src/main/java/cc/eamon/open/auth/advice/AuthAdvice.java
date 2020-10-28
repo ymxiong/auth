@@ -45,7 +45,7 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     }
 
     @Override
-    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression) {
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult) {
         return true;
     }
 

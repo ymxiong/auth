@@ -9,7 +9,6 @@ import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
 import cc.eamon.open.error.Assert;
-import cc.eamon.open.status.StatusException;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import org.aopalliance.intercept.MethodInvocation;
@@ -83,9 +82,9 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
             env.put(a1, requestValue);
             env.put(a2, contextValue);
             boolean innerExecute = (Boolean) expression.execute(env) && (requestValue != null || contextValue != null);
-            return innerExecute && authenticator.checkExpression(request, response, uri, expressionString);
+            return authenticator.checkExpression(request, response, uri, expressionString, innerExecute);
         } catch (Exception e) {
-            throw new StatusException("EXP_ERROR");
+            return authenticator.checkExpression(request, response, uri, expressionString, false);
         }
     }
 

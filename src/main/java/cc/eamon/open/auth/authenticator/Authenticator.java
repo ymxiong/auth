@@ -14,7 +14,7 @@ public interface Authenticator {
 
     boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group);
 
-    boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression);
+    boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult);
 
     Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName);
 
