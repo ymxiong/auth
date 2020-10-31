@@ -54,8 +54,10 @@ public abstract class StatusAdvice implements ErrorDecoder {
      */
     @Override
     public Exception decode(String s, Response response) {
+        String exceptionDetail = "the remote exception method is:" + s;
+        logger.error(exceptionDetail);
         //识别异常
-        StatusException statusException = new StatusException(SERVICE_ERROR,"远程服务调用异常");
+        StatusException statusException = new StatusException(SERVICE_ERROR,"远程服务调用异常",exceptionDetail);
         String exceptionContent;
         try{
             //转化异常
@@ -67,7 +69,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
                     int code = Integer.parseInt(responseJson.getString("status"));
                     String msg = responseJson.getString("message");
                     if(!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)){
-                        statusException = new StatusException(code,msg);
+                        statusException = new StatusException(code,msg,exceptionDetail);
                     }
                 }
             }
