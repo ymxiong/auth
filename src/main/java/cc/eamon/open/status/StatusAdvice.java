@@ -48,6 +48,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
 
     /**
      * 跨服务异常捕获、解析和重抛，替换默认的feign异常处理
+     *
      * @param s
      * @param response
      * @return
@@ -57,25 +58,23 @@ public abstract class StatusAdvice implements ErrorDecoder {
         String exceptionDetail = "the remote exception method is:" + s;
         logger.error(exceptionDetail);
         //识别异常
-        StatusException statusException = new StatusException(SERVICE_ERROR,"远程服务调用异常",exceptionDetail);
-        String exceptionContent;
-        try{
+        StatusException statusException = new StatusException(SERVICE_ERROR, "远程服务调用异常", exceptionDetail);
+        try {
             //转化异常
-            exceptionContent = Util.toString(response.body().asReader());
-            if(!StringUtils.isEmpty(exceptionContent)){
-                exceptionContent.replaceAll("\n","").replaceAll("\t","");
-                JSONObject responseJson = (JSONObject) JSON.parse(exceptionContent);
-                if(responseJson != null){
-                    int code = Integer.parseInt(responseJson.getString("status"));
-                    String msg = responseJson.getString("message");
-                    if(!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)){
-                        statusException = new StatusException(code,msg,exceptionDetail);
-                    }
-                }
+            String exceptionContent = Util.toString(response.body().asReader());
+            if (StringUtils.isEmpty(exceptionContent)) return statusException;
+            exceptionContent = exceptionContent.replaceAll("\n", "").replaceAll("\t", "");
+
+            JSONObject responseJson = (JSONObject) JSON.parse(exceptionContent);
+            if (responseJson == null) return statusException;
+            int code = Integer.parseInt(responseJson.getString("status"));
+            String msg = responseJson.getString("message");
+            if (!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)) {
+                statusException = new StatusException(code, msg, exceptionDetail);
             }
             return statusException;
-        }catch (Exception e){
-            logger.error("feign处理异常错误",e);
+        } catch (Exception e) {
+            logger.error("feign处理异常错误", e);
             return statusException;
         }
     }
