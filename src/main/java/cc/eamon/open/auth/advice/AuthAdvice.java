@@ -51,17 +51,19 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     @Override
     public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
         String value = request.getHeader(valueName);
-        if (valueName.contains("cookie")) {
+        if (valueName.contains("cookie") && valueName.contains("$")) {
             String[] values = valueName.split("\\$");
-            if (values.length < 2) return null;
+            if (values.length < 2) return value;
             Cookie[] cookies = request.getCookies();
             if (null != cookies) {
                 for (Cookie cookie : cookies) {
                     if (values[1].equals(cookie.getName())) return cookie.getValue();
                 }
             }
-        }else if (valueName.contains("header")){
-            return value;
+        } else if (valueName.contains("header") && valueName.contains("$")) {
+            String[] values = valueName.split("\\$");
+            if (values.length < 2) return value;
+            return request.getHeader(values[1]);
         }
         return value;
     }
