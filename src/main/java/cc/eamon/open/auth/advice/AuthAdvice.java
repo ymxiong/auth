@@ -4,6 +4,7 @@ import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -57,13 +58,15 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
             Cookie[] cookies = request.getCookies();
             if (null != cookies) {
                 for (Cookie cookie : cookies) {
-                    if (values[1].equals(cookie.getName())) return cookie.getValue();
+                    if (values[1].toLowerCase().equals(cookie.getName().toLowerCase())) return cookie.getValue();
                 }
             }
         } else if (valueName.contains("header") && valueName.contains("$")) {
             String[] values = valueName.split("\\$");
             if (values.length < 2) return value;
-            return request.getHeader(values[1]);
+            value = request.getHeader(values[1]);
+            if (StringUtils.isEmpty(value)) value = request.getHeader(values[1].toLowerCase());
+            return value;
         }
         return value;
     }
