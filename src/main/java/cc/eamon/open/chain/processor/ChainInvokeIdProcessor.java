@@ -1,11 +1,6 @@
 package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.ChainContextHolder;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Author: eamon
@@ -14,6 +9,8 @@ import java.util.List;
  */
 public class ChainInvokeIdProcessor implements ChainKeyProcessor {
 
+    public static String PARENT_COUNTER = null;
+
     @Override
     public ChainKeyEnum chainKey() {
         return ChainKeyEnum.CHAIN_INVOKE_ID;
@@ -21,11 +18,10 @@ public class ChainInvokeIdProcessor implements ChainKeyProcessor {
 
     @Override
     public void handle(String key, String value) {
-        List<String> invokeIds = new ArrayList<>();
-        if (!StringUtils.isEmpty(value)) {
-            Collections.addAll(invokeIds, value.split("."));
+        StringBuilder invokeId = new StringBuilder(value);
+        if (PARENT_COUNTER != null) {
+            invokeId.append(PARENT_COUNTER).append(".");
+            ChainContextHolder.put(chainKey(), invokeId.toString());
         }
-        invokeIds.add("0");
-        ChainContextHolder.put(chainKey(), invokeIds);
     }
 }

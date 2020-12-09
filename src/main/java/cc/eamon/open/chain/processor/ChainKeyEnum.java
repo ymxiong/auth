@@ -11,27 +11,37 @@ public enum ChainKeyEnum {
     /**
      * time key to record chain first app first thread open time
      */
-    CHAIN_OPEN_TIME("OPEN-TIME", new ChainTimeProcessor()),
+    CHAIN_OPEN_TIME("OPEN-TIME", ChainTimeProcessor.class),
 
     /**
      * time key to record current app current thread open time
      */
-    APP_OPEN_TIME("THREAD-TIME", new ThreadTimeProcessor()),
+    APP_OPEN_TIME("THREAD-TIME", ThreadTimeProcessor.class),
 
     /**
      * invoke key to record the invoke sequence
      */
-    CHAIN_INVOKE_ID("THREAD-INVOKE-ID", new ChainInvokeIdProcessor()),
+    CHAIN_INVOKE_ID("THREAD-INVOKE-ID", ChainInvokeIdProcessor.class),
+
+    SPAN_ID("SPAN-ID", ChainSpanIdProcessor.class),
+
+    PARENT_ID("PARENT-ID",ChainParentIdProcessor.class),
+
+    TRACE_ID("TRACE-ID", ChainTraceIdProcessor.class),
+
+    USER_MAP("USER-MAP",null),
+
+    THREAD_COUNTER("THREAD-COUNTER",ChainThreadCounterProcessor.class),
 
     /**
      * user id key to record user id
      */
-    USER_ID("USER-ID", "userId", new UserIdProcessor()),
+//    USER_ID("USER-ID", "userId", new UserIdProcessor()),
 
     /**
      * user token key to record user token
      */
-    USER_TOKEN("USER-TOKEN", "token", new UserTokenProcessor()),
+//    USER_TOKEN("USER-TOKEN", "token", new UserTokenProcessor()),
 
     ;
 
@@ -54,14 +64,14 @@ public enum ChainKeyEnum {
     /**
      * chain key processor
      */
-    private ChainKeyProcessor keyProcessor;
+    private Class<? extends ChainKeyProcessor> keyProcessor;
 
-    ChainKeyEnum(String key, ChainKeyProcessor keyProcessor) {
+    ChainKeyEnum(String key, Class<? extends ChainKeyProcessor> keyProcessor) {
         this.key = key;
         this.keyProcessor = keyProcessor;
     }
 
-    ChainKeyEnum(String key, String mapKey, ChainKeyProcessor keyProcessor) {
+    ChainKeyEnum(String key, String mapKey, Class<? extends ChainKeyProcessor> keyProcessor) {
         this.key = key;
         this.mapKey = mapKey;
         this.keyProcessor = keyProcessor;
@@ -71,7 +81,7 @@ public enum ChainKeyEnum {
         return KEY_PREFIX + key;
     }
 
-    public ChainKeyProcessor getKeyProcessor() {
+    public Class<? extends ChainKeyProcessor> getKeyProcessor() {
         return keyProcessor;
     }
 
@@ -83,7 +93,7 @@ public enum ChainKeyEnum {
         this.mapKey = mapKey;
     }
 
-    public static ChainKeyProcessor getKeyProcessor(String key) {
+    public static Class<? extends ChainKeyProcessor> getKeyProcessor(String key) {
         // check chain key
         boolean isChainKey = isChainKey(key);
         // proc chain enum key & not chain mapping key
@@ -96,9 +106,9 @@ public enum ChainKeyEnum {
         }
         // proc chain not enum key & other cases
         if (isChainKey) {
-            return new DefaultChainKeyProcessor();
+            return DefaultChainKeyProcessor.class;
         } else {
-            return new NotChainKeyProcessor();
+            return NotChainKeyProcessor.class;
         }
     }
 
