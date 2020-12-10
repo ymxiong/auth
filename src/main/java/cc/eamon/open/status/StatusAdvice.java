@@ -1,5 +1,7 @@
 package cc.eamon.open.status;
 
+import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.processor.ChainKeyEnum;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import feign.Response;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 public abstract class StatusAdvice implements ErrorDecoder {
@@ -27,6 +32,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
     @ExceptionHandler(value = {Exception.class})
     @ResponseBody
     public Map<String, Object> statusExceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
+        this.statusExceptionChainContextHandler(response);
         logger.error(e.getMessage());
         Status.Builder builder;
         if (e instanceof StatusException) {
@@ -44,21 +50,45 @@ public abstract class StatusAdvice implements ErrorDecoder {
         return builder.map();
     }
 
+    private void statusExceptionChainContextHandler(HttpServletResponse response){
+        String traceID = (String) ChainContextHolder.get(ChainKeyEnum.TRACE_ID);
+        String spanID = (String) ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
+        String parentID = ChainContextHolder.get(ChainKeyEnum.PARENT_ID) == null ? "" : (String) ChainContextHolder.get(ChainKeyEnum.PARENT_ID);
+        logger.error("SPAN => " + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
+                + ChainKeyEnum.SPAN_ID.getKey() + "-" + spanID +
+                ((parentID == null || "".equals(parentID)) ? "" : "::" + ChainKeyEnum.PARENT_ID.getKey() + "-" + parentID));
+        response.addHeader(ChainKeyEnum.TRACE_ID.getKey(), traceID);
+        response.addHeader(ChainKeyEnum.SPAN_ID.getKey(), spanID);
+        if(!"".equals(parentID))
+            response.addHeader(ChainKeyEnum.PARENT_ID.getKey(), parentID);
+    }
+
     public abstract boolean setResponseStatus();
 
     /**
      * 跨服务异常捕获、解析和重抛，替换默认的feign异常处理
      *
-     * @param s
+     * @param errorMethod
      * @param response
      * @return
      */
     @Override
-    public Exception decode(String s, Response response) {
-        String exceptionDetail = "the remote exception method is:" + s;
-        logger.error(exceptionDetail);
+    public Exception decode(String errorMethod, Response response) {
+        StringBuilder exceptionDetail = new StringBuilder();
+        Map<String, Collection<String>> headers = response.headers();
+        headers.forEach( (header,values) -> {
+            if(ChainKeyEnum.isChainKey(header.toUpperCase())){
+                Collection<String> collection = headers.get(header);
+                String value = (String)((List) collection).get(0);
+                exceptionDetail.append(header.toUpperCase())
+                                .append("-")
+                                .append(value)
+                                .append(" ");
+            }
+        });
+        logger.error(exceptionDetail.append("ERROR_METHOD-").append(errorMethod).toString());
         //识别异常
-        StatusException statusException = new StatusException(SERVICE_ERROR, "远程服务调用异常", exceptionDetail);
+        StatusException statusException = new StatusException(SERVICE_ERROR, "远程服务调用异常", exceptionDetail.toString());
         try {
             //转化异常
             String exceptionContent = Util.toString(response.body().asReader());
@@ -70,7 +100,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
             int code = Integer.parseInt(responseJson.getString("status"));
             String msg = responseJson.getString("message");
             if (!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)) {
-                statusException = new StatusException(code, msg, exceptionDetail);
+                statusException = new StatusException(code, msg, exceptionDetail.toString());
             }
             return statusException;
         } catch (Exception e) {

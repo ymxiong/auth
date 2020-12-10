@@ -112,11 +112,9 @@ public enum ChainKeyEnum {
         }
     }
 
-
-    private static boolean isChainKey(String key) {
+    public static boolean isChainKey(String key) {
         if (key == null) return false;
         return key.startsWith(KEY_PREFIX);
     }
-
 
 }

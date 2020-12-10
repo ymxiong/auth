@@ -4,6 +4,8 @@ import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
 import cc.eamon.open.error.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,9 +19,9 @@ import java.util.UUID;
  * Email: eamon@eamon.cc
  * Time: 2020-08-19 21:53:58
  */
-
 public class ChainContextHandlerInterceptor implements HandlerInterceptor {
 
+    private static Logger logger = LoggerFactory.getLogger(ChainContextHandlerInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -49,12 +51,17 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
 
     private void startCheck(){
         if(ChainContextHolder.get(ChainKeyEnum.TRACE_ID) == null){
-            String traceID = UUID.randomUUID().toString();
+            String traceID = UUID.randomUUID().toString().replaceAll("-","");
             ChainContextHolder.put(ChainKeyEnum.TRACE_ID,traceID);
+            logger.info("CHAIN => " + traceID + "-START");
             ChainContextHolder.put(ChainKeyEnum.SPAN_ID,traceID);
+            logger.info("SPAN => " + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
+                    + ChainKeyEnum.SPAN_ID.getKey() + "-" + traceID);
         }
-        if(ChainContextHolder.get(ChainKeyEnum.CHAIN_INVOKE_ID) == null)
+        if(ChainContextHolder.get(ChainKeyEnum.CHAIN_INVOKE_ID) == null) {
             ChainContextHolder.put(ChainKeyEnum.CHAIN_INVOKE_ID, "1.");
+            logger.info("INVOKE => " + ChainKeyEnum.CHAIN_INVOKE_ID + "-" + "1");
+        }
     }
 
 }

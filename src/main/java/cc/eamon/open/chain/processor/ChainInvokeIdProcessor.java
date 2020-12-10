@@ -23,5 +23,7 @@ public class ChainInvokeIdProcessor implements ChainKeyProcessor {
             invokeId.append(PARENT_COUNTER).append(".");
             ChainContextHolder.put(chainKey(), invokeId.toString());
         }
+        logger.info("INVOKE => " + ChainKeyEnum.CHAIN_INVOKE_ID.getKey()
+                + "-" + invokeId.substring(0,invokeId.length() - 1));
     }
 }

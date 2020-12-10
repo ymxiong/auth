@@ -19,8 +19,9 @@ public class ChainTraceIdProcessor implements ChainKeyProcessor{
     @Override
     public void handle(String key, String value) {
         if(value == null || "".equals(value)) {
-            value = UUID.randomUUID().toString();
+            value = UUID.randomUUID().toString().replaceAll("-","");
         }
         ChainContextHolder.put(chainKey(),value);
+        logger.info("CHAIN => " + value + "-RUNNING");
     }
 }

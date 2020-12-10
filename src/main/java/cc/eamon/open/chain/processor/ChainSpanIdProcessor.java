@@ -19,7 +19,8 @@ public class ChainSpanIdProcessor implements ChainKeyProcessor{
     @Override
     public void handle(String key, String value) {
         ChainContextHolder.put(ChainKeyEnum.PARENT_ID,value);
-        String spanId = UUID.randomUUID().toString();
+        String spanId = UUID.randomUUID().toString().replaceAll("-","");
         ChainContextHolder.put(chainKey(),spanId);
+        logger.info("SPAN => " + ChainKeyEnum.SPAN_ID.getKey() + "-" + spanId);
     }
 }

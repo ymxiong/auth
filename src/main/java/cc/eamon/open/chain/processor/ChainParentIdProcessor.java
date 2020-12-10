@@ -17,6 +17,6 @@ public class ChainParentIdProcessor implements ChainKeyProcessor{
 
     @Override
     public void handle(String key, String value) {
-
+        logger.info("PARENT_SPAN => " + ChainKeyEnum.PARENT_ID.getKey() + "-" + value);
     }
 }
