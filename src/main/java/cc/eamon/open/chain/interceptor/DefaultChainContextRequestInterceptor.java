@@ -1,16 +1,16 @@
 package cc.eamon.open.chain.interceptor;
 
-import cc.eamon.open.chain.ChainContext;
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.parser.ChainKeyParser;
+import cc.eamon.open.chain.parser.DefaultChainKeyParser;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
-import cc.eamon.open.chain.processor.ChainThreadCounterProcessor;
 import cc.eamon.open.error.Assert;
+import cc.eamon.open.status.StatusException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.UUID;
 
 /**
  * Author: Zhu yuhan
@@ -26,17 +26,13 @@ public abstract class DefaultChainContextRequestInterceptor implements RequestIn
         ChainContextHolder.put(ChainKeyEnum.THREAD_COUNTER,counter + "");
     }
 
-//    @Override
-//    public void parseChainContext() {
-//        Object v1 = ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
-//        if(v1 == null)return;
-//        ChainContextHolder.put(ChainKeyEnum.PARENT_ID,v1);
-//    }
-
     @Override
     public boolean checkChainContext() {
-//        String spanId = (String)ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
-//        if(spanId == null || "".equals(spanId)) return false;
+        //check if begin with CHAIN-
+        for (String chainKey : ChainContextHolder.get().keySet()) {
+            if(!ChainKeyEnum.isChainKey(chainKey))
+                return false;
+        }
         return true;
     }
 
@@ -56,4 +52,47 @@ public abstract class DefaultChainContextRequestInterceptor implements RequestIn
     public void applyChainContext() {
 
     }
+
+//    //被调用服务调用该方法
+//    protected void parseChainContextHandle(String key1, Class type1, String key2, Class type2, ChainKeyParser chainKeyParser, ChainKeyProcessor chainKeyProcessor){
+//        this.parseChainContext(key1, type1, key2, type2, chainKeyParser);
+//
+//    }
+
+    protected void parseChainContext(String key1, Class type1, String key2, Class type2, ChainKeyParser chainKeyParser){
+        if(ChainKeyEnum.isDefaultChainKey(key1) || ChainKeyEnum.isDefaultChainKey(key2))
+            throw new StatusException(727, "can't parse default CHAIN-KEY");
+        Object v1 = ChainContextHolder.get(key1);
+        if(v1 == null) Assert.notNull(null, "CHAIN_PARSE_ERROR");
+        if(type1.getName().equals(type2.getName()) || (type1 == null && type2 == null)){
+            ChainContextHolder.put(key2, v1);
+            return;
+        }
+        ChainKeyParser parser = chainKeyParser;
+        if(parser == null) {
+            try {
+                parser = DefaultChainKeyParser.class.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                Assert.notNull(null, "CHAIN_ERROR");
+            }
+        }
+        String encodeChainContext = parser.encodeChainContext(v1);
+        ChainContextHolder.put(key2, parser.decodeChainContext(encodeChainContext));
+        ChainContextHolder.get().remove(key1);
+    }
+
+    protected void parseChainContext(String key1, String key2, Class type2, ChainKeyParser chainKeyParser){
+        Object v1 = ChainContextHolder.get(key1);
+        if(v1 == null) Assert.notNull(null, "CHAIN_PARSE_ERROR");
+        this.parseChainContext(key1, v1.getClass(), key2, type2, chainKeyParser);
+    }
+
+    //同一数据类型换名
+    protected void parseChainContext(String key1, String key2){
+        this.parseChainContext(key1, null, key2, null, null);
+    }
+
+    public abstract void parseChainContext();
+
+
 }

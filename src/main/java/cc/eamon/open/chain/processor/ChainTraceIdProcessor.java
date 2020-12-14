@@ -2,6 +2,7 @@ package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.ChainContext;
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.parser.ChainKeyParser;
 
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class ChainTraceIdProcessor implements ChainKeyProcessor{
     }
 
     @Override
-    public void handle(String key, String value) {
+    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
         if(value == null || "".equals(value)) {
             value = UUID.randomUUID().toString().replaceAll("-","");
         }

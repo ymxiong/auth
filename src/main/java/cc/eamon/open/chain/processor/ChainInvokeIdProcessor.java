@@ -1,6 +1,7 @@
 package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.parser.ChainKeyParser;
 
 /**
  * Author: eamon
@@ -17,13 +18,12 @@ public class ChainInvokeIdProcessor implements ChainKeyProcessor {
     }
 
     @Override
-    public void handle(String key, String value) {
+    public void handle(String key, String value, Class<? extends ChainKeyParser> parser) {
         StringBuilder invokeId = new StringBuilder(value);
         if (PARENT_COUNTER != null) {
             invokeId.append(PARENT_COUNTER).append(".");
             ChainContextHolder.put(chainKey(), invokeId.toString());
         }
-        logger.info("INVOKE => " + ChainKeyEnum.CHAIN_INVOKE_ID.getKey()
-                + "-" + invokeId.substring(0,invokeId.length() - 1));
+        logger.info("INVOKE => " + chainKey().getKey() + "-" + invokeId.substring(0,invokeId.length() - 1));
     }
 }

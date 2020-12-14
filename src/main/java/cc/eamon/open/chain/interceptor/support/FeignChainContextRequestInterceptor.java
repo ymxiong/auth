@@ -2,6 +2,9 @@ package cc.eamon.open.chain.interceptor.support;
 
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.interceptor.DefaultChainContextRequestInterceptor;
+import cc.eamon.open.chain.parser.ChainKeyParserEnum;
+import cc.eamon.open.chain.parser.ChainKeyParser;
+import cc.eamon.open.error.Assert;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -39,7 +42,21 @@ public abstract class FeignChainContextRequestInterceptor extends DefaultChainCo
 
     private void applyChainContext(RequestTemplate requestTemplate){
         for (String chainKey : ChainContextHolder.get().keySet()) {
-            requestTemplate.header(chainKey,(String) ChainContextHolder.get(chainKey));
+            Object chain = ChainContextHolder.get(chainKey);
+            //parser.encode string not need parser
+            Class<? extends ChainKeyParser> parserClass = ChainKeyParserEnum.getChainKeyParser(chain.getClass());
+            if(parserClass == null){
+                requestTemplate.header(chainKey,(String) ChainContextHolder.get(chainKey));
+                continue;
+            }
+            ChainKeyParser parser = null;
+            try {
+                parser = parserClass.getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                Assert.notNull(null, "CHAIN_PARSE_ERROR");
+            }
+
+            requestTemplate.header(chainKey,parser.encodeChainContext(chain));
         }
     }
 }

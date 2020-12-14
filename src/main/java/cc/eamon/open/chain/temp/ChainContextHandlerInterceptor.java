@@ -1,6 +1,8 @@
 package cc.eamon.open.chain.temp;
 
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.parser.ChainKeyParser;
+import cc.eamon.open.chain.parser.ChainKeyParserEnum;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
 import cc.eamon.open.error.Assert;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,9 +26,12 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
 
     private static Logger logger = LoggerFactory.getLogger(ChainContextHandlerInterceptor.class);
 
+    private static final String START_HEADER = "CHAIN-START";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        this.startCheck();
+        if(request.getHeader(START_HEADER.toLowerCase()) == null)
+            this.startCheck();
         Enumeration<String> headerEnumeration = request.getHeaderNames();
         while (headerEnumeration.hasMoreElements()) {
             String header = headerEnumeration.nextElement().toUpperCase();
@@ -34,10 +40,11 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
             try {
                 processor = processorClass.getDeclaredConstructor().newInstance();
             } catch (Exception e){
-                Assert.notNull(processor,"CHAIN_ERROR");
+                Assert.notNull(null,"CHAIN_ERROR");
             }
+            Class<? extends ChainKeyParser> parserClass = ChainKeyParserEnum.getChainKeyParser(header);
             String value = Optional.ofNullable(request.getHeader(header)).orElse(request.getParameter(header));
-            processor.handle(header, value);
+            processor.handle(header, value, parserClass);
         }
         return true;
     }
@@ -57,11 +64,19 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
             ChainContextHolder.put(ChainKeyEnum.SPAN_ID,traceID);
             logger.info("SPAN => " + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
                     + ChainKeyEnum.SPAN_ID.getKey() + "-" + traceID);
+            ChainContextHolder.put(ChainKeyEnum.PARENT_ID,traceID);
         }
         if(ChainContextHolder.get(ChainKeyEnum.CHAIN_INVOKE_ID) == null) {
             ChainContextHolder.put(ChainKeyEnum.CHAIN_INVOKE_ID, "1.");
             logger.info("INVOKE => " + ChainKeyEnum.CHAIN_INVOKE_ID + "-" + "1");
         }
+        if(ChainContextHolder.get(ChainKeyEnum.CHAIN_OPEN_TIME) == null){
+            Date openTime = new Date();
+            ChainContextHolder.put(ChainKeyEnum.CHAIN_OPEN_TIME, openTime);
+            ChainContextHolder.put(ChainKeyEnum.APP_OPEN_TIME, openTime);
+            logger.info("CHAIN_OPEN_TIME => " + openTime);
+        }
+        ChainContextHolder.put(START_HEADER, "0");
     }
 
 }
