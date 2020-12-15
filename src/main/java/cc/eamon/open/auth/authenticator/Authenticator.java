@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public interface Authenticator {
 
-    boolean open();
+    boolean open(HttpServletRequest request, HttpServletResponse response);
 
     boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group);
 

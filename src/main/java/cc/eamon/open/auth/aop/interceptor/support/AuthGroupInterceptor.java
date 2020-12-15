@@ -32,11 +32,11 @@ public class AuthGroupInterceptor extends BaseAnnotationMethodInterceptor {
     public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) {
         if (!(annotation instanceof AuthGroup)) return;
         Authenticator authenticator = AuthenticatorHolder.get();
-        if (!authenticator.open()) return;
-
-        AuthGroup authAnnotation = (AuthGroup) annotation;
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+        if (!authenticator.open(request, response)) return;
+
+        AuthGroup authAnnotation = (AuthGroup) annotation;
         String uri = request.getRequestURI();
 
         String[] groups = authAnnotation.value();

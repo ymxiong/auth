@@ -38,11 +38,11 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
     public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) {
         if (!(annotation instanceof AuthExpression)) return;
         Authenticator authenticator = AuthenticatorHolder.get();
-        if (!authenticator.open()) return;
-
-        AuthExpression authAnnotation = (AuthExpression) annotation;
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+        if (!authenticator.open(request, response)) return;
+
+        AuthExpression authAnnotation = (AuthExpression) annotation;
 
         String[] expressions = authAnnotation.value();
         Logical[] logicalList = authAnnotation.logical();

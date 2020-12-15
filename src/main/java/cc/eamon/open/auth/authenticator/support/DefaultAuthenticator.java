@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 public class DefaultAuthenticator implements Authenticator {
 
     @Override
-    public boolean open() {
+    public boolean open(HttpServletRequest request, HttpServletResponse response) {
         return true;
     }
 

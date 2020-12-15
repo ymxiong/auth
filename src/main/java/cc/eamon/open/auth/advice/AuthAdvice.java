@@ -4,8 +4,10 @@ import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +19,9 @@ import java.lang.reflect.Method;
  * Time: 2020-08-14 21:53:40
  */
 public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor implements Authenticator {
+
+    @Resource
+    protected ApplicationContext applicationContext;
 
     public AuthAdvice() {
         this.setAdvice(new AuthMethodInterceptorProxy(this));
@@ -74,6 +79,15 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     @Override
     public Object getRequestValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
         return request.getParameter(valueName);
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    public String getSpringContextActiveProfile() {
+        if (applicationContext == null) return null;
+        return applicationContext.getEnvironment().getActiveProfiles()[0];
     }
 
 }

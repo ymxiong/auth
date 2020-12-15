@@ -9,7 +9,11 @@ import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Queue;
@@ -32,7 +36,9 @@ public class AuthInterceptor extends BaseAnnotationMethodInterceptor {
     public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) {
         if (!(annotation instanceof Auth)) return;
         Authenticator authenticator = AuthenticatorHolder.get();
-        if (!authenticator.open()) return;
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+        if (!authenticator.open(request, response)) return;
         Auth authAnnotation = (Auth) annotation;
         logicalQueue.add(Logical.AND);
         logicalQueue.addAll(Arrays.asList(authAnnotation.logical()));
