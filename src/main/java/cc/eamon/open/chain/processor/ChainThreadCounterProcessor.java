@@ -1,6 +1,7 @@
 package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.chain.parser.ChainKeyParser;
 
 /**
  * Author: eamon
@@ -15,7 +16,7 @@ public class ChainThreadCounterProcessor implements ChainKeyProcessor {
     }
     
     @Override
-    public void handle(String key, String value) {
+    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
         ChainInvokeIdProcessor.PARENT_COUNTER = value;
     }
 

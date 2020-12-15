@@ -24,17 +24,26 @@ public class ChainContextAdvice extends FeignChainContextRequestInterceptor impl
 
     @Override
     public void parseChainContext() {
-        //例如
-//        Object v1 = ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
-//        if(v1 == null)return;
-//        ChainContextHolder.put(ChainKeyEnum.PARENT_ID,v1);
-        //parse else
+        //test
+        ChainContextHolder.put("abc","123456");
+        parseChainContext("abc", "CHAIN-DATE-cde", Date.class, new ChainKeyParser() {
+            @Override
+            public String encodeChainContext(Object chainContext) {
+                return chainContext.toString();
+            }
+
+            @Override
+            public Object decodeChainContext(String temp) {
+                return new Date(Long.parseLong(temp));
+            }
+        });
     }
 
     @Override
     public void addChainContext(HttpServletRequest httpServletRequest) {
         //add into chainContext or requestAttr
 //        httpServletRequest.setAttribute(xxx,xxx);
+        ChainContextHolder.put("CHAIN-JSON", new User("123456"));
     }
 
     //如果check不通过，将不会进行链路传递

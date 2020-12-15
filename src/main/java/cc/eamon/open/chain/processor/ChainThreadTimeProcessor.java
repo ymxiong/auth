@@ -6,7 +6,6 @@ import cc.eamon.open.chain.parser.DateChainKeyParser;
 import cc.eamon.open.error.Assert;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 /**
@@ -14,20 +13,19 @@ import java.util.Date;
  * Email: eamon@eamon.cc
  * Time: 2020-08-23 17:09:18
  */
-public class ChainTimeProcessor implements ChainKeyProcessor {
-
+public class ChainThreadTimeProcessor implements ChainKeyProcessor {
 
     @Override
     public ChainKeyEnum chainKey() {
-        return ChainKeyEnum.CHAIN_OPEN_TIME;
+        return ChainKeyEnum.APP_OPEN_TIME;
     }
 
     @Override
     public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
         Date date = null;
-        Object chainValue = ChainContextHolder.get(chainKey());
-        if(chainValue != null){
-            date = (Date) chainValue;
+        Object time = ChainContextHolder.get(chainKey());
+        if(time != null){
+            date = (Date) time;
             logger.info(chainKey().getKey() + " => " + date);
             return;
         }
@@ -42,9 +40,9 @@ public class ChainTimeProcessor implements ChainKeyProcessor {
             date = parser.decodeChainContext(value);
         }
         if (date == null) {
-            Object appTime = ChainContextHolder.get(ChainKeyEnum.APP_OPEN_TIME);
-            if(appTime != null)
-                date = (Date) appTime;
+            Object openTime = ChainContextHolder.get(ChainKeyEnum.CHAIN_OPEN_TIME);
+            if(openTime != null)
+                date = (Date) openTime;
             if (date == null) {
                 date = new Date();
             }
@@ -52,4 +50,6 @@ public class ChainTimeProcessor implements ChainKeyProcessor {
         ChainContextHolder.put(chainKey(), date);
         logger.info(chainKey().getKey() + " => " + date);
     }
+
+
 }

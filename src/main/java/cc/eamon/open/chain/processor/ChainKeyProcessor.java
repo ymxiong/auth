@@ -1,5 +1,6 @@
 package cc.eamon.open.chain.processor;
 
+import cc.eamon.open.chain.parser.ChainKeyParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,11 +11,11 @@ import org.slf4j.LoggerFactory;
  */
 public interface ChainKeyProcessor {
 
-    static Logger logger = LoggerFactory.getLogger(ChainKeyProcessor.class);
+    Logger logger = LoggerFactory.getLogger(ChainKeyProcessor.class);
 
     ChainKeyEnum chainKey();
 
-    void handle(String key, String value);
+    void handle(String key, String value, Class<? extends ChainKeyParser> parserClass);
 
 
 }
