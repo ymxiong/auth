@@ -12,7 +12,7 @@ import java.lang.reflect.InvocationTargetException;
  * Email: eamon@eamon.cc
  * Time: 2020-08-23 16:42:32
  */
-public class DefaultChainKeyProcessor implements ChainKeyProcessor {
+public class DefaultChainKeyProcessor extends BaseChainKeyProcessor {
 
     @Override
     public ChainKeyEnum chainKey() {
@@ -20,20 +20,15 @@ public class DefaultChainKeyProcessor implements ChainKeyProcessor {
     }
 
     @Override
-    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
-        if (StringUtils.isEmpty(value)) return;
-        if (parserClass == null) {
-            ChainContextHolder.put(key, value);
-            return;
-        }
-        ChainKeyParser parser = null;
-        try {
-            parser = parserClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-        }
-        ChainContextHolder.put(key, parser.decodeChainContext(value));
+    public void init() {
+
     }
 
+    @Override
+    public void handle(String key, Object value) {
+        if (StringUtils.isEmpty(value)) return;
+        ChainContextHolder.put(key, value);
+    }
 
 
 }

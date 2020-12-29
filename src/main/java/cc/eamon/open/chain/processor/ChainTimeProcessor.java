@@ -14,7 +14,7 @@ import java.util.Date;
  * Email: eamon@eamon.cc
  * Time: 2020-08-23 17:09:18
  */
-public class ChainTimeProcessor implements ChainKeyProcessor {
+public class ChainTimeProcessor extends BaseChainKeyProcessor {
 
 
     @Override
@@ -23,27 +23,25 @@ public class ChainTimeProcessor implements ChainKeyProcessor {
     }
 
     @Override
-    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
+    public void init() {
+        Date openTime = new Date();
+        ChainContextHolder.put(ChainKeyEnum.CHAIN_OPEN_TIME, openTime);
+        ChainContextHolder.put(ChainKeyEnum.APP_OPEN_TIME, openTime);
+        logger.info("CHAIN_OPEN_TIME => " + openTime);
+    }
+
+    @Override
+    public void handle(String key, Object value) {
         Date date = null;
         Object chainValue = ChainContextHolder.get(chainKey());
-        if(chainValue != null){
+        if (chainValue != null) {
             date = (Date) chainValue;
             logger.info(chainKey().getKey() + " => " + date);
             return;
         }
-        Class<? extends ChainKeyParser> parserClazz = ChainKeyEnum.getKeyParser(key);
-        DateChainKeyParser parser = null;
-        try {
-            parser = (DateChainKeyParser) parserClazz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            Assert.notNull(null, "CHAIN_PARSE_ERROR");
-        }
-        if (!StringUtils.isEmpty(value)) {
-            date = parser.decodeChainContext(value);
-        }
         if (date == null) {
             Object appTime = ChainContextHolder.get(ChainKeyEnum.APP_OPEN_TIME);
-            if(appTime != null)
+            if (appTime != null)
                 date = (Date) appTime;
             if (date == null) {
                 date = new Date();

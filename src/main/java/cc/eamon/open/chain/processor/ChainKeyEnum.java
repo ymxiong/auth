@@ -5,7 +5,7 @@ import cc.eamon.open.chain.parser.DateChainKeyParser;
 import cc.eamon.open.chain.parser.DefaultChainKeyParser;
 
 /**
- * TODO:NEED OPTIMIZE
+ * TODO:NEED OPTIMIZE NEED SUPPORT SORT
  * Author: eamon
  * Email: eamon@eamon.cc
  * Time: 2020-08-23 16:37:53
@@ -15,25 +15,25 @@ public enum ChainKeyEnum {
     /**
      * time key to record chain first app first thread open time
      */
-    CHAIN_OPEN_TIME("OPEN-TIME", ChainTimeProcessor.class, DateChainKeyParser.class),
+    CHAIN_OPEN_TIME("OPEN-TIME", "DATE", ChainTimeProcessor.class),
 
     /**
      * time key to record current app current thread open time
      */
-    APP_OPEN_TIME("THREAD-TIME", ChainThreadTimeProcessor.class, DateChainKeyParser.class),
+    APP_OPEN_TIME("THREAD-TIME", "DATE", ChainThreadTimeProcessor.class),
 
     /**
      * invoke key to record the invoke sequence
      */
-    CHAIN_INVOKE_ID("THREAD-INVOKE-ID", ChainInvokeIdProcessor.class),
+    CHAIN_INVOKE_ID("THREAD-INVOKE-ID", "STRING", ChainInvokeIdProcessor.class),
 
-    SPAN_ID("SPAN-ID", ChainSpanIdProcessor.class),
+    SPAN_ID("SPAN-ID", "STRING", ChainSpanIdProcessor.class),
 
-    PARENT_ID("PARENT-ID",ChainParentIdProcessor.class),
+    PARENT_ID("PARENT-ID", "STRING", ChainParentIdProcessor.class),
 
-    TRACE_ID("TRACE-ID", ChainTraceIdProcessor.class),
+    TRACE_ID("TRACE-ID", "STRING", ChainTraceIdProcessor.class),
 
-    THREAD_COUNTER("THREAD-COUNTER",ChainThreadCounterProcessor.class),
+    THREAD_COUNTER("THREAD-COUNTER", "INTEGER", ChainThreadCounterProcessor.class),
 
     /**
      * user id key to record user id
@@ -68,11 +68,6 @@ public enum ChainKeyEnum {
      */
     private Class<? extends ChainKeyProcessor> keyProcessor;
 
-    /**
-     * chain key parser
-     */
-    private Class<? extends ChainKeyParser> keyParser;
-
     ChainKeyEnum(String key, Class<? extends ChainKeyProcessor> keyProcessor) {
         this.key = key;
         this.keyProcessor = keyProcessor;
@@ -84,29 +79,12 @@ public enum ChainKeyEnum {
         this.keyProcessor = keyProcessor;
     }
 
-    ChainKeyEnum(String key, String mapKey, Class<? extends ChainKeyProcessor> keyProcessor, Class<? extends ChainKeyParser> keyParser) {
-        this.key = key;
-        this.mapKey = mapKey;
-        this.keyProcessor = keyProcessor;
-        this.keyParser = keyParser;
-    }
-
-    ChainKeyEnum(String key, Class<? extends ChainKeyProcessor> keyProcessor, Class<? extends ChainKeyParser> keyParser) {
-        this.key = key;
-        this.keyProcessor = keyProcessor;
-        this.keyParser = keyParser;
-    }
-
     public String getKey() {
         return KEY_PREFIX + key;
     }
 
     public Class<? extends ChainKeyProcessor> getKeyProcessor() {
         return keyProcessor;
-    }
-
-    public Class<? extends ChainKeyParser> getKeyParser() {
-        return keyParser;
     }
 
     public String getMapKey() {
@@ -136,25 +114,12 @@ public enum ChainKeyEnum {
         }
     }
 
-    public static Class<? extends ChainKeyParser> getKeyParser(String key){
-        // proc chain enum key & not chain mapping key
-        for (ChainKeyEnum value : ChainKeyEnum.values()) {
-            if (key.equals(value.getKey())) {
-                return value.getKeyParser();
-            } else if (key != null && key.equals(value.getMapKey())) {
-                return value.getKeyParser();
-            }
-        }
-        // proc chain not enum key & other cases
-        return DefaultChainKeyParser.class;
-    }
-
     public static boolean isChainKey(String key) {
         if (key == null) return false;
         return key.startsWith(KEY_PREFIX);
     }
 
-    public static boolean isDefaultChainKey(String key){
+    public static boolean isDefaultChainKey(String key) {
         if (key == null) return false;
         for (ChainKeyEnum chainKeyEnum : ChainKeyEnum.values()) {
             if (chainKeyEnum.getKey().equals(key))

@@ -9,37 +9,36 @@ import java.util.Date;
  **/
 public enum ChainKeyParserEnum {
 
-    DEFAULT_PARSER(Object.class, DefaultChainKeyParser.class),
+    DEFAULT_PARSER("DEFAULT", Object.class, new DefaultChainKeyParser()),
 
-    DATE_PARSER("DATE-", Date.class, DateChainKeyParser.class),
+    DATE_PARSER("DATE", Date.class, new DateChainKeyParser()),
 
-    INTEGER_PARSER("INTEGER-", Integer.class, IntegerChainKeyParser.class),
+    INTEGER_PARSER("INTEGER", Integer.class, new IntegerChainKeyParser()),
 
-    LONG_PARSER("LONG-", Long.class, LongChainKeyParser.class),
+    LONG_PARSER("LONG", Long.class, new LongChainKeyParser()),
 
-    STRING_PARSER("STRING-", String.class, null)
-    ;
+    STRING_PARSER("STRING", String.class, new StringChainKeyParser());
 
     private String tag;
 
     private Class classType;
 
-    private Class<? extends ChainKeyParser> parser;
+    private ChainKeyParser parser;
 
-    private static final String CHAIN_PREFIX = "CHAIN-";
-
-    ChainKeyParserEnum(String tag, Class classType, Class<? extends ChainKeyParser> parser){
+    ChainKeyParserEnum(String tag, Class classType, ChainKeyParser parser) {
         this.tag = tag;
         this.classType = classType;
         this.parser = parser;
     }
 
-    ChainKeyParserEnum(Class classType, Class<? extends ChainKeyParser> parser){
+    ChainKeyParserEnum(Class classType, ChainKeyParser parser) {
         this.classType = classType;
         this.parser = parser;
     }
 
-    public String getChainKeyTag(){ return CHAIN_PREFIX + tag; }
+    public String getParserTag() {
+        return tag;
+    }
 
     public Class getClassType() {
         return classType;
@@ -49,29 +48,30 @@ public enum ChainKeyParserEnum {
         this.classType = classType;
     }
 
-    public Class<? extends ChainKeyParser> getParser() {
+    public ChainKeyParser getParser() {
         return parser;
     }
 
-    public void setParser(Class<? extends ChainKeyParser> parser) {
+    public void setParser(ChainKeyParser parser) {
         this.parser = parser;
     }
 
-    public static Class<? extends ChainKeyParser> getChainKeyParser(Class classType){
-        if(classType.equals(String.class)) return null;
+    public static ChainKeyParser getChainKeyParser(Class classType) {
         for (ChainKeyParserEnum value : ChainKeyParserEnum.values()) {
-            if(value.classType.equals(classType))
+            if (value.classType.equals(classType))
                 return value.getParser();
         }
-        return DefaultChainKeyParser.class;
+        return DEFAULT_PARSER.getParser();
     }
 
-    public static Class<? extends ChainKeyParser> getChainKeyParser(String tag){
+    public static ChainKeyParser getChainKeyParser(String type) {
+        if (type == null || "".equals(type))
+            return DEFAULT_PARSER.getParser();
         for (ChainKeyParserEnum value : ChainKeyParserEnum.values()) {
-            if (tag.startsWith(value.getChainKeyTag()))
+            if (type.startsWith(value.getParserTag()))
                 return value.getParser();
         }
-        return DefaultChainKeyParser.class;
+        return DEFAULT_PARSER.getParser();
     }
 
 }

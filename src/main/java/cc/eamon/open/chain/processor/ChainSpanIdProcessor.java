@@ -11,14 +11,19 @@ import java.util.UUID;
  * Email: zhuyuhan2333@qq.com
  * Date: 2020/12/2 20:58
  **/
-public class ChainSpanIdProcessor implements ChainKeyProcessor{
+public class ChainSpanIdProcessor extends BaseChainKeyProcessor{
     @Override
     public ChainKeyEnum chainKey() {
         return ChainKeyEnum.SPAN_ID;
     }
 
     @Override
-    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
+    public void init() {
+
+    }
+
+    @Override
+    public void handle(String key, Object value) {
         ChainContextHolder.put(ChainKeyEnum.PARENT_ID,value);
         String spanId = UUID.randomUUID().toString().replaceAll("-","");
         ChainContextHolder.put(chainKey(),spanId);

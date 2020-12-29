@@ -15,7 +15,11 @@ public interface ChainKeyProcessor {
 
     ChainKeyEnum chainKey();
 
-    void handle(String key, String value, Class<? extends ChainKeyParser> parserClass);
+    String mapKey();
+
+    void init();
+
+    void handle(String key, String value);
 
 
 }

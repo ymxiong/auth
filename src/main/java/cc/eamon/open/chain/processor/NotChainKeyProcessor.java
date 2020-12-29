@@ -15,10 +15,19 @@ public class NotChainKeyProcessor implements ChainKeyProcessor {
     public ChainKeyEnum chainKey() {
         return null;
     }
-    
+
     @Override
-    public void handle(String key, String value, Class<? extends ChainKeyParser> parserClass) {
+    public String mapKey() {
+        return null;
+    }
+
+    @Override
+    public void init() {
 
     }
 
+    @Override
+    public void handle(String key, String value) {
+
+    }
 }

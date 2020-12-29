@@ -8,9 +8,9 @@ import cc.eamon.open.chain.parser.ChainKeyParser;
  * Email: eamon@eamon.cc
  * Time: 2020-08-23 17:09:18
  */
-public class ChainInvokeIdProcessor implements ChainKeyProcessor {
+public class ChainInvokeIdProcessor extends BaseChainKeyProcessor {
 
-    public static String PARENT_COUNTER = null;
+    public static Integer PARENT_COUNTER = null;
 
     @Override
     public ChainKeyEnum chainKey() {
@@ -18,12 +18,18 @@ public class ChainInvokeIdProcessor implements ChainKeyProcessor {
     }
 
     @Override
-    public void handle(String key, String value, Class<? extends ChainKeyParser> parser) {
-        StringBuilder invokeId = new StringBuilder(value);
+    public void init() {
+        ChainContextHolder.put(chainKey(), "1.");
+        logger.info("INVOKE => " + chainKey() + "-" + "1");
+    }
+
+    @Override
+    public void handle(String key, Object value) {
+        StringBuilder invokeId = new StringBuilder(value.toString());
         if (PARENT_COUNTER != null) {
             invokeId.append(PARENT_COUNTER).append(".");
             ChainContextHolder.put(chainKey(), invokeId.toString());
         }
-        logger.info("INVOKE => " + chainKey().getKey() + "-" + invokeId.substring(0,invokeId.length() - 1));
+        logger.info("INVOKE => " + chainKey().getKey() + "-" + invokeId.substring(0, invokeId.length() - 1));
     }
 }
