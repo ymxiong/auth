@@ -17,5 +17,9 @@ public abstract class UserBaseChainKeyProcessor extends BaseChainKeyProcessor {
         return getUserMapKey();
     }
 
+    /**
+     * 用户自定义MapKey匹配Parser
+     * @return
+     */
     public abstract String getUserMapKey();
 }

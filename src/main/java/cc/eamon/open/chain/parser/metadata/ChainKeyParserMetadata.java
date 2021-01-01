@@ -1,5 +1,11 @@
-package cc.eamon.open.chain.parser;
+package cc.eamon.open.chain.parser.metadata;
 
+import cc.eamon.open.chain.parser.ChainKeyParser;
+import cc.eamon.open.chain.parser.ChainKeyParserEnum;
+import cc.eamon.open.chain.parser.DefaultMapChainKeyParser;
+import cc.eamon.open.chain.parser.map.UserGenericMap;
+
+import java.lang.reflect.TypeVariable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,11 +28,11 @@ public class ChainKeyParserMetadata {
         }
     }
 
-    private String tag;
+    protected String tag;
 
-    private Class classType;
+    protected Class classType;
 
-    private ChainKeyParser chainKeyParser;
+    protected ChainKeyParser chainKeyParser;
 
     public ChainKeyParserMetadata(String tag, Class classType, ChainKeyParser chainKeyParser) {
         this.tag = tag;
@@ -34,6 +40,8 @@ public class ChainKeyParserMetadata {
         this.chainKeyParser = chainKeyParser;
     }
 
+    public ChainKeyParserMetadata() {
+    }
 
     public String getTag() {
         return tag;
@@ -59,13 +67,28 @@ public class ChainKeyParserMetadata {
         this.chainKeyParser = chainKeyParser;
     }
 
+    private static Map<String, ChainKeyParser> getChainKeyParserTagMap() {
+        return chainKeyParserTagMap;
+    }
+
+    private static Map<Class, ChainKeyParser> getChainKeyParserClassMap() {
+        return chainKeyParserClassMap;
+    }
+
     public static void addChainKeyParser(ChainKeyParserMetadata chainKeyParserMetadata) {
         chainKeyParserTagMap.put(chainKeyParserMetadata.getTag(), chainKeyParserMetadata.getChainKeyParser());
         chainKeyParserClassMap.put(chainKeyParserMetadata.getClassType(), chainKeyParserMetadata.getChainKeyParser());
 
     }
 
+    public static void addGenericChainKeyParser(GenericChainKeyParserMetadata chainKeyParserMetadata) {
+        //TODO 是否需要分离
+        chainKeyParserTagMap.put(chainKeyParserMetadata.getTag(), chainKeyParserMetadata.getChainKeyParser());
+    }
+
     public static ChainKeyParser getChainKeyParser(Class classType) {
+        if (Map.class.isAssignableFrom(classType))
+            return ChainKeyParserEnum.DEFAULT_MAP_PARSER.getParser();
         for (Class value : chainKeyParserClassMap.keySet()) {
             if (value.equals(classType))
                 return chainKeyParserClassMap.get(value);
@@ -77,7 +100,7 @@ public class ChainKeyParserMetadata {
         if (type == null || "".equals(type))
             return ChainKeyParserEnum.DEFAULT_PARSER.getParser();
         for (String parserTag : chainKeyParserTagMap.keySet()) {
-            if (type.startsWith(parserTag))
+            if (type.equals(parserTag))
                 return chainKeyParserTagMap.get(parserTag);
         }
         return ChainKeyParserEnum.DEFAULT_PARSER.getParser();

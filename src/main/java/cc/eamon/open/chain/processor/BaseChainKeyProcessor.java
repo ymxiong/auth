@@ -1,7 +1,7 @@
 package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.parser.ChainKeyParser;
-import cc.eamon.open.chain.parser.ChainKeyParserMetadata;
+import cc.eamon.open.chain.parser.metadata.ChainKeyParserMetadata;
 
 /**
  * Author: Zhu yuhan

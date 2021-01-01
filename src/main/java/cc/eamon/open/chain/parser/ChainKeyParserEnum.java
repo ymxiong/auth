@@ -1,6 +1,7 @@
 package cc.eamon.open.chain.parser;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Author: Zhu yuhan
@@ -17,7 +18,9 @@ public enum ChainKeyParserEnum {
 
     LONG_PARSER("LONG", Long.class, new LongChainKeyParser()),
 
-    STRING_PARSER("STRING", String.class, new StringChainKeyParser());
+    STRING_PARSER("STRING", String.class, new StringChainKeyParser()),
+
+    DEFAULT_MAP_PARSER("MAP", Map.class, new DefaultMapChainKeyParser(String.class, String.class));
 
     private String tag;
 

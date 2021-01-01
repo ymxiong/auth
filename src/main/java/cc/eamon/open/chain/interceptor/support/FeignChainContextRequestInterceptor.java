@@ -3,7 +3,9 @@ package cc.eamon.open.chain.interceptor.support;
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.interceptor.BaseChainContextRequestInterceptor;
 import cc.eamon.open.chain.parser.ChainKeyParser;
-import cc.eamon.open.chain.parser.ChainKeyParserMetadata;
+import cc.eamon.open.chain.parser.map.UserGenericMap;
+import cc.eamon.open.chain.parser.metadata.ChainKeyParserMetadata;
+import cc.eamon.open.chain.parser.metadata.GenericChainKeyParserMetadata;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -42,7 +44,21 @@ public abstract class FeignChainContextRequestInterceptor extends BaseChainConte
     private void applyChainContext(RequestTemplate requestTemplate) {
         for (String chainKey : ChainContextHolder.get().keySet()) {
             Object chain = ChainContextHolder.get(chainKey);
-            ChainKeyParser chainKeyParser = ChainKeyParserMetadata.getChainKeyParser(chain.getClass());
+            //TODO  1.出现类继承时如何匹配 例： Map -> HashMap
+            //TODO  2.泛型如何匹配 例： Map<K,V> -> Map<K,V> parser
+            //首先判断是否为Map类型
+            ChainKeyParser chainKeyParser;
+            Class<?> chainClass = chain.getClass();
+            if (UserGenericMap.class.isAssignableFrom(chainClass)) {
+                UserGenericMap userGenericMap = (UserGenericMap) chain;
+                chainKeyParser = GenericChainKeyParserMetadata.getChainKeyParser(
+                        new GenericChainKeyParserMetadata.GenericMetadata(
+                                userGenericMap.getK(), userGenericMap.getV()
+                        )
+                );
+            } else {
+                chainKeyParser = ChainKeyParserMetadata.getChainKeyParser(chainClass);
+            }
             requestTemplate.header(chainKey, chainKeyParser.encodeChainContext(chain));
         }
     }

@@ -1,9 +1,8 @@
 package cc.eamon.open.chain.temp;
 
 import cc.eamon.open.chain.ChainContextHolder;
-import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
-import cc.eamon.open.chain.processor.ChainKeyProcessorMetadata;
+import cc.eamon.open.chain.processor.metadata.ChainKeyProcessorMetadata;
 import cc.eamon.open.error.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
