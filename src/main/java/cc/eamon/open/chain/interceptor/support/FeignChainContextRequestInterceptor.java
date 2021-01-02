@@ -45,8 +45,8 @@ public abstract class FeignChainContextRequestInterceptor extends BaseChainConte
         for (String chainKey : ChainContextHolder.get().keySet()) {
             Object chain = ChainContextHolder.get(chainKey);
             //TODO  1.出现类继承时如何匹配 例： Map -> HashMap
-            //TODO  2.泛型如何匹配 例： Map<K,V> -> Map<K,V> parser
-            //首先判断是否为Map类型
+            //TODO  2.泛型如何匹配 例： Map<K,V> -> Map<K,V> parser 已解决，自定义UserGenericMap类型
+            //首先判断是否为UserGenericMap类型
             ChainKeyParser chainKeyParser;
             Class<?> chainClass = chain.getClass();
             if (UserGenericMap.class.isAssignableFrom(chainClass)) {

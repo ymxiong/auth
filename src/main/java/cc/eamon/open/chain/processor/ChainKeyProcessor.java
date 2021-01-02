@@ -15,7 +15,7 @@ public interface ChainKeyProcessor {
 
     ChainKeyEnum chainKey();
 
-    String mapKey();
+    String parserMapTag();
 
     void init();
 

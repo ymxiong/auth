@@ -28,8 +28,14 @@ public class ChainKeyParserMetadata {
         }
     }
 
+    /**
+     * tag how processor match parser
+     */
     protected String tag;
 
+    /**
+     * which class parser parse
+     */
     protected Class classType;
 
     protected ChainKeyParser chainKeyParser;

@@ -20,7 +20,7 @@ public enum ChainKeyParserEnum {
 
     STRING_PARSER("STRING", String.class, new StringChainKeyParser()),
 
-    DEFAULT_MAP_PARSER("MAP", Map.class, new DefaultMapChainKeyParser(String.class, String.class));
+    DEFAULT_MAP_PARSER("MAP", Map.class, new DefaultMapChainKeyParser());
 
     private String tag;
 

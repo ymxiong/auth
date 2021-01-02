@@ -13,13 +13,14 @@ public abstract class UserBaseChainKeyProcessor extends BaseChainKeyProcessor {
     }
 
     @Override
-    public String mapKey() {
-        return getUserMapKey();
+    public String parserMapTag() {
+        return getUserParserMapTag();
     }
 
     /**
-     * 用户自定义MapKey匹配Parser
+     * 用户自定义MapTag匹配Parser
+     * return tag of how processor match parser
      * @return
      */
-    public abstract String getUserMapKey();
+    public abstract String getUserParserMapTag();
 }

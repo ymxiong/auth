@@ -1,6 +1,8 @@
 package cc.eamon.open.chain.parser;
 
 
+import cc.eamon.open.chain.parser.metadata.GenericChainKeyParserMetadata;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -9,26 +11,20 @@ import java.util.Map;
  * Email: zhuyuhan2333@qq.com
  * Date: 2020/12/29 20:48
  **/
-public abstract class MapBaseChainKeyParser<K, V> implements ChainKeyParser<Map<K, V>> {
+public abstract class MapBaseChainKeyParser<K, V> extends BaseChainKeyParser<Map<K, V>> {
 
-    protected Class K;
-
-    protected Class V;
-
-    public MapBaseChainKeyParser() {
+    protected static void registry(GenericChainKeyParserMetadata genericChainKeyParserMetadata){
+        GenericChainKeyParserMetadata.addChainKeyParser(genericChainKeyParserMetadata);
     }
 
-    public MapBaseChainKeyParser(Class k, Class v) {
-        this.K = k;
-        this.V = v;
+    protected GenericChainKeyParserMetadata.GenericMetadata genericMetadata;
+
+    protected MapBaseChainKeyParser(GenericChainKeyParserMetadata.GenericMetadata genericMetadata) {
+        this.genericMetadata = genericMetadata;
     }
 
-    public Class getK() {
-        return K;
-    }
-
-    public Class getV() {
-        return V;
+    public GenericChainKeyParserMetadata.GenericMetadata getGenericMetadata() {
+        return genericMetadata;
     }
 
     /**

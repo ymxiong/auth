@@ -1,9 +1,5 @@
 package cc.eamon.open.chain.processor;
 
-import cc.eamon.open.chain.parser.ChainKeyParser;
-import cc.eamon.open.chain.parser.DateChainKeyParser;
-import cc.eamon.open.chain.parser.DefaultChainKeyParser;
-
 /**
  * TODO:NEED OPTIMIZE NEED SUPPORT SORT
  * Author: eamon
@@ -59,9 +55,9 @@ public enum ChainKeyEnum {
     private String key;
 
     /**
-     * chain key map key
+     * chain key map parser tag
      */
-    private String mapKey;
+    private String parserMapTag;
 
     /**
      * chain key processor
@@ -73,9 +69,9 @@ public enum ChainKeyEnum {
         this.keyProcessor = keyProcessor;
     }
 
-    ChainKeyEnum(String key, String mapKey, Class<? extends ChainKeyProcessor> keyProcessor) {
+    ChainKeyEnum(String key, String parserMapTag, Class<? extends ChainKeyProcessor> keyProcessor) {
         this.key = key;
-        this.mapKey = mapKey;
+        this.parserMapTag = parserMapTag;
         this.keyProcessor = keyProcessor;
     }
 
@@ -87,12 +83,12 @@ public enum ChainKeyEnum {
         return keyProcessor;
     }
 
-    public String getMapKey() {
-        return mapKey;
+    public String getParserMapTag() {
+        return parserMapTag;
     }
 
-    public void setMapKey(String mapKey) {
-        this.mapKey = mapKey;
+    public void setParserMapTag(String parserMapTag) {
+        this.parserMapTag = parserMapTag;
     }
 
     public static Class<? extends ChainKeyProcessor> getKeyProcessor(String key) {
@@ -102,7 +98,7 @@ public enum ChainKeyEnum {
         for (ChainKeyEnum value : ChainKeyEnum.values()) {
             if (isChainKey && key.equals(value.getKey())) {
                 return value.getKeyProcessor();
-            } else if (!isChainKey && key != null && key.equals(value.getMapKey())) {
+            } else if (!isChainKey && key != null && key.equals(value.getParserMapTag())) {
                 return value.getKeyProcessor();
             }
         }

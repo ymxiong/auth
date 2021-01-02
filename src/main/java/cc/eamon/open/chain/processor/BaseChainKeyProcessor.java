@@ -2,6 +2,7 @@ package cc.eamon.open.chain.processor;
 
 import cc.eamon.open.chain.parser.ChainKeyParser;
 import cc.eamon.open.chain.parser.metadata.ChainKeyParserMetadata;
+import cc.eamon.open.chain.processor.metadata.ChainKeyProcessorMetadata;
 
 /**
  * Author: Zhu yuhan
@@ -10,14 +11,18 @@ import cc.eamon.open.chain.parser.metadata.ChainKeyParserMetadata;
  **/
 public abstract class BaseChainKeyProcessor implements ChainKeyProcessor {
 
+    protected static void registry(ChainKeyProcessorMetadata chainKeyProcessorMetadata){
+        ChainKeyProcessorMetadata.addChainKeyProcessor(chainKeyProcessorMetadata);
+    }
+
     @Override
-    public String mapKey() {
-        return chainKey() == null ? null : chainKey().getMapKey();
+    public String parserMapTag() {
+        return chainKey() == null ? null : chainKey().getParserMapTag();
     }
 
     @Override
     public void handle(String key, String value) {
-        ChainKeyParser chainKeyParser = ChainKeyParserMetadata.getChainKeyParser(mapKey());
+        ChainKeyParser chainKeyParser = ChainKeyParserMetadata.getChainKeyParser(parserMapTag());
         Object chainContext = chainKeyParser.decodeChainContext(value);
         handle(key, chainContext);
     }

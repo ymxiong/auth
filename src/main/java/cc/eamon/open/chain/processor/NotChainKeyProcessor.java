@@ -17,7 +17,7 @@ public class NotChainKeyProcessor implements ChainKeyProcessor {
     }
 
     @Override
-    public String mapKey() {
+    public String parserMapTag() {
         return null;
     }
 

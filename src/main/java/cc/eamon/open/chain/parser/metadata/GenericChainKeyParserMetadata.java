@@ -22,11 +22,15 @@ public class GenericChainKeyParserMetadata extends ChainKeyParserMetadata {
 
     private GenericMetadata genericMetadata;
 
-    public GenericChainKeyParserMetadata(String tag, Class classType, ChainKeyParser chainKeyParser) {
+    private GenericChainKeyParserMetadata(String tag, Class classType, ChainKeyParser chainKeyParser) {
         super(tag, classType, chainKeyParser);
         MapBaseChainKeyParser mapBaseChainKeyParser = (MapBaseChainKeyParser) chainKeyParser;
-        this.genericMetadata = new GenericMetadata(mapBaseChainKeyParser.getK(), mapBaseChainKeyParser.getV());
+        this.genericMetadata = mapBaseChainKeyParser.getGenericMetadata();
         this.genericTag = tag;
+    }
+
+    public GenericChainKeyParserMetadata(String tag, ChainKeyParser chainKeyParser){
+        this(tag,null,chainKeyParser);
     }
 
     public GenericMetadata getGenericMetadata() {

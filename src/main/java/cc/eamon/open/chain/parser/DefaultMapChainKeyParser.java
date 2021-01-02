@@ -1,5 +1,7 @@
 package cc.eamon.open.chain.parser;
 
+import cc.eamon.open.chain.parser.metadata.GenericChainKeyParserMetadata;
+
 import java.util.Map;
 
 /**
@@ -9,8 +11,8 @@ import java.util.Map;
  **/
 public class DefaultMapChainKeyParser extends MapBaseChainKeyParser<String, String> {
 
-    DefaultMapChainKeyParser(Class k, Class v) {
-        super(String.class, String.class);
+    DefaultMapChainKeyParser() {
+        super(new GenericChainKeyParserMetadata.GenericMetadata(String.class, String.class));
     }
 
     @Override

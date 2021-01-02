@@ -1,6 +1,5 @@
 package cc.eamon.open.chain.processor.metadata;
 
-import cc.eamon.open.chain.parser.metadata.GenericChainKeyParserMetadata;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
 import cc.eamon.open.chain.processor.DefaultChainKeyProcessor;
@@ -33,9 +32,9 @@ public class ChainKeyProcessorMetadata {
     private String key;
 
     /**
-     * chain key map key
+     * chain key map parser tag
      */
-    private String mapKey;
+    private String parserMapTag;
 
     /**
      * chain key processor
@@ -47,12 +46,6 @@ public class ChainKeyProcessorMetadata {
         this.keyProcessor = keyProcessor;
     }
 
-//    public ChainKeyProcessorMetadata(String key, String mapKey, Class<? extends ChainKeyProcessor> keyProcessor) {
-//        this.key = key;
-//        this.mapKey = mapKey;
-//        this.keyProcessor = keyProcessor;
-//    }
-
     public String getKey() {
         return KEY_PREFIX + key;
     }
@@ -61,12 +54,12 @@ public class ChainKeyProcessorMetadata {
         this.key = key;
     }
 
-    public String getMapKey() {
-        return mapKey;
+    public String getParserMapTag() {
+        return parserMapTag;
     }
 
-    public void setMapKey(String mapKey) {
-        this.mapKey = mapKey;
+    public void setParserMapTag(String parserMapTag) {
+        this.parserMapTag = parserMapTag;
     }
 
     public Class<? extends ChainKeyProcessor> getKeyProcessor() {
