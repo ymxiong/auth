@@ -49,16 +49,20 @@ public abstract class StatusAdvice implements ErrorDecoder {
         return builder.map();
     }
 
-    private void statusExceptionChainContextHandler(HttpServletResponse response){
+    private void statusExceptionChainContextHandler(HttpServletResponse response) {
         String traceID = (String) ChainContextHolder.get(ChainKeyEnum.TRACE_ID);
+        if (StringUtils.isEmpty(traceID)) {
+            logger.error("ERROR BEFORE CHAIN PROCESS");
+            return;
+        }
         String spanID = (String) ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
         String parentID = ChainContextHolder.get(ChainKeyEnum.PARENT_ID) == null ? "" : (String) ChainContextHolder.get(ChainKeyEnum.PARENT_ID);
         logger.error("SPAN => " + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
                 + ChainKeyEnum.SPAN_ID.getKey() + "-" + spanID +
-                ((parentID == null || "".equals(parentID)) ? "" : "::" + ChainKeyEnum.PARENT_ID.getKey() + "-" + parentID));
+                (StringUtils.isEmpty(parentID) ? "" : "::" + ChainKeyEnum.PARENT_ID.getKey() + "-" + parentID));
         response.addHeader(ChainKeyEnum.TRACE_ID.getKey(), traceID);
         response.addHeader(ChainKeyEnum.SPAN_ID.getKey(), spanID);
-        if(!"".equals(parentID))
+        if (!"".equals(parentID))
             response.addHeader(ChainKeyEnum.PARENT_ID.getKey(), parentID);
     }
 
@@ -74,15 +78,15 @@ public abstract class StatusAdvice implements ErrorDecoder {
     @Override
     public Exception decode(String errorMethod, Response response) {
         StringBuilder exceptionDetail = new StringBuilder();
-        Map<String, Collection<String>> headers = response.headers();
-        headers.forEach( (header,values) -> {
-            if(ChainKeyEnum.isChainKey(header.toUpperCase())){
+        Map<String, Collection<String>> headers = response.headers().;
+        headers.forEach((header, values) -> {
+            if (ChainKeyEnum.isChainKey(header.toUpperCase())) {
                 Collection<String> collection = headers.get(header);
-                String value = (String)((List) collection).get(0);
+                String value = (String) ((List) collection).get(0);
                 exceptionDetail.append(header.toUpperCase())
-                                .append("-")
-                                .append(value)
-                                .append(" ");
+                        .append("-")
+                        .append(value)
+                        .append(" ");
             }
         });
         logger.error(exceptionDetail.append("ERROR_METHOD-").append(errorMethod).toString());
