@@ -78,7 +78,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
     @Override
     public Exception decode(String errorMethod, Response response) {
         StringBuilder exceptionDetail = new StringBuilder();
-        Map<String, Collection<String>> headers = response.headers().;
+        Map<String, Collection<String>> headers = response.headers();
         headers.forEach((header, values) -> {
             if (ChainKeyEnum.isChainKey(header.toUpperCase())) {
                 Collection<String> collection = headers.get(header);
