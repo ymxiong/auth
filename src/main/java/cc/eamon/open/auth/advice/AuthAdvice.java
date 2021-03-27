@@ -1,14 +1,13 @@
 package cc.eamon.open.auth.advice;
 
 import cc.eamon.open.auth.AuthEnums;
+import cc.eamon.open.auth.advice.strategy.ContextValueStrategyEnums;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.context.ApplicationContext;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
@@ -56,24 +55,7 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
 
     @Override
     public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
-        String value = request.getHeader(valueName);
-        if (valueName.contains("cookie") && valueName.contains("$")) {
-            String[] values = valueName.split("\\$");
-            if (values.length < 2) return value;
-            Cookie[] cookies = request.getCookies();
-            if (null != cookies) {
-                for (Cookie cookie : cookies) {
-                    if (values[1].toLowerCase().equals(cookie.getName().toLowerCase())) return cookie.getValue();
-                }
-            }
-        } else if (valueName.contains("header") && valueName.contains("$")) {
-            String[] values = valueName.split("\\$");
-            if (values.length < 2) return value;
-            value = request.getHeader(values[1]);
-            if (StringUtils.isEmpty(value)) value = request.getHeader(values[1].toLowerCase());
-            return value;
-        }
-        return value;
+        return ContextValueStrategyEnums.getContextValueStrategy(valueName).getStrategy().parse(request, response, valueName);
     }
 
     @Override
