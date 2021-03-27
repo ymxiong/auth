@@ -1,0 +1,269 @@
+{
+  "name": "STATUS_SUCCESS_FLOW",
+  "type": "flow",
+  "id": "STATUS_SUCCESS_FLOW",
+  "routes": [
+    {
+      "id": "ROUTE_1",
+      "type": "start",
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_1"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_1",
+      "type": "event",
+      "name": "FLOW_STATUS_SUCCESS",
+      "reference": "FLOW_STATUS_SUCCESS",
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_2"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_2",
+      "type": "event",
+      "name": "FLOW_STATUS_MESSAGE",
+      "reference": "FLOW_STATUS_MESSAGE",
+      "params": [
+        {
+          "name": "message",
+          "type": "String",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_3"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_3",
+      "type": "event",
+      "name": "FLOW_STATUS_PATH",
+      "reference": "FLOW_STATUS_PATH",
+      "params": [
+        {
+          "name": "path",
+          "type": "String",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_4"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_4",
+      "type": "event",
+      "name": "FLOW_STATUS_DATA",
+      "reference": "FLOW_STATUS_DATA",
+      "params": [
+        {
+          "name": "key",
+          "type": "String",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "value",
+          "type": "Object",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_5"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_5",
+      "type": "event",
+      "name": "FLOW_STATUS_DATA_VALUE",
+      "reference": "FLOW_STATUS_DATA_VALUE",
+      "params": [
+        {
+          "name": "data",
+          "type": "Object",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_6"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_6",
+      "type": "event",
+      "name": "FLOW_STATUS_DATA_COUNT",
+      "reference": "FLOW_STATUS_DATA_COUNT",
+      "params": [
+        {
+          "name": "count",
+          "type": "Long",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_7"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_7",
+      "type": "event",
+      "name": "FLOW_STATUS_EXTRA",
+      "reference": "FLOW_STATUS_EXTRA",
+      "params": [
+        {
+          "name": "extra",
+          "type": "Object",
+          "notNull": "false",
+          "defaultValue": "",
+          "scope": "initScope"
+        },
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "successBuilder",
+        "type": "Status.Builder",
+        "scope": "initScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "FLOW_8"
+        }
+      ]
+    },
+    {
+      "id": "FLOW_8",
+      "type": "event",
+      "name": "FLOW_STATUS_MAP",
+      "reference": "FLOW_STATUS_MAP",
+      "params": [
+        {
+          "name": "successBuilder",
+          "type": "Status.Builder",
+          "notNull": "true",
+          "defaultValue": "",
+          "scope": "initScope"
+        }
+      ],
+      "result": {
+        "name": "resultMap",
+        "type": "Map",
+        "scope": "testScope"
+      },
+      "targets": [
+        {
+          "condition": "true",
+          "target": "ROUTE_3"
+        }
+      ]
+    },
+    {
+      "id": "ROUTE_3",
+      "type": "end"
+    }
+  ]
+}

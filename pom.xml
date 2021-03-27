@@ -46,6 +46,7 @@
         <aviator-version>5.1.4</aviator-version>
         <feign-version>10.4.0</feign-version>
         <fastjson-verson>1.2.62</fastjson-verson>
+        <flow-version>0.1.2</flow-version>
     </properties>
 
     <dependencies>
@@ -113,6 +114,12 @@
             <version>${fastjson-verson}</version>
         </dependency>
 
+        <dependency>
+            <groupId>cc.eamon.open</groupId>
+            <artifactId>flow-core</artifactId>
+            <version>${flow-version}</version>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>
@@ -165,6 +172,23 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.0.1</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <version>1.6.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>**/*.json</include>
+                    </includes>
+                </configuration>
             </plugin>
 
         </plugins>
