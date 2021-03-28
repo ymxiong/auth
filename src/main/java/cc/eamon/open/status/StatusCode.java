@@ -1,5 +1,7 @@
 package cc.eamon.open.status;
 
+import cc.eamon.easyfile.FileTools;
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -72,43 +74,43 @@ public class StatusCode {
     private static HashMap<Integer, StatusCode> codeToCodeMap = new HashMap<>();
 
     static {
-        Properties prop = new Properties();
-        Resource resource = new ClassPathResource("status.properties");
+        Resource resource = new ClassPathResource("status.json");
         try {
-            prop.load(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
-            prop.stringPropertyNames().forEach((e) -> {
-                String cm[] = prop.getProperty(e).split("::");
-                Assert.isTrue(cm.length >= 2, "status.properties 加载错误");
-
-                StatusCode code = new StatusCode();
-                code.code = Integer.parseInt(cm[0].trim());
-                code.msg = cm[1].trim();
-
-                switch (e) {
+            String statusJsonString = FileTools.inputStream2Str(resource.getInputStream());
+            JSONObject statusJson = (JSONObject) JSONObject.parse(statusJsonString);
+            Assert.isTrue("status".equals(statusJson.getString("type")), "status.json 加载错误(type is not status)");
+            logger.info("CURRENT STATUS: " + statusJson.getString("name"));
+            statusJson.getJSONArray("errors").forEach((e) -> {
+                JSONObject error = (JSONObject) e;
+                StatusCode statusCode = new StatusCode();
+                statusCode.code = error.getInteger("code");
+                statusCode.msg = error.getString("message");
+                String id = error.getString("id");
+                switch (id) {
                     case "SUCCESS":
-                        SUCCESS = code.code;
-                        SUCCESS_MSG = code.msg;
+                        SUCCESS = statusCode.code;
+                        SUCCESS_MSG = statusCode.msg;
                         break;
                     case "FAILED":
-                        FAILED = code.code;
-                        FAILED_MSG = code.msg;
+                        FAILED = statusCode.code;
+                        FAILED_MSG = statusCode.msg;
                         break;
                     case "NO_AUTH":
-                        NO_AUTH = code.code;
-                        NO_AUTH_MSG = code.msg;
+                        NO_AUTH = statusCode.code;
+                        NO_AUTH_MSG = statusCode.msg;
                     case "NO_RECOGNIZE":
-                        NO_RECOGNIZE = code.code;
-                        NO_RECOGNIZE_MSG = code.msg;
+                        NO_RECOGNIZE = statusCode.code;
+                        NO_RECOGNIZE_MSG = statusCode.msg;
                         break;
                 }
-                errorNameToCodeMap.put(e, code);
-                codeToCodeMap.put(code.code, code);
-                Assert.isTrue(errorNameToCodeMap.size() == codeToCodeMap.size(), "status.properties 加载错误");
+                errorNameToCodeMap.put(id, statusCode);
+                codeToCodeMap.put(statusCode.code, statusCode);
+                Assert.isTrue(errorNameToCodeMap.size() == codeToCodeMap.size(), "status.json 加载错误(codes do not match error)");
             });
 
 
         } catch (Exception e) {
-            logger.error("status.properties 加载错误");
+            logger.error("status.json 加载错误");
         }
     }
 
