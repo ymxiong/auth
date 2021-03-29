@@ -120,6 +120,12 @@
             <version>${flow-version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>cc.eamon</groupId>
+            <artifactId>easyfile</artifactId>
+            <version>0.0.2</version>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>
