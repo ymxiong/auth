@@ -31,11 +31,12 @@ public abstract class StatusAdvice implements ErrorDecoder {
     @ExceptionHandler(value = {Exception.class})
     @ResponseBody
     public Map<String, Object> statusExceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
-        this.statusExceptionChainContextHandler(response);
+        this.statusExceptionChainContextHandler(response, e);
         logger.error(e.getMessage());
         Status.Builder builder;
         if (e instanceof StatusException) {
             StatusException exception = (StatusException) e;
+            logger.error("error detail:" + exception.getDetail());
             if (setResponseStatus()) response.setStatus(exception.getCode());
             builder = Status.failedBuilder(exception);
         } else if (e instanceof RuntimeException) {
@@ -49,10 +50,18 @@ public abstract class StatusAdvice implements ErrorDecoder {
         return builder.map();
     }
 
-    private void statusExceptionChainContextHandler(HttpServletResponse response) {
+    private void statusExceptionChainContextHandler(HttpServletResponse response, Exception e) {
         String traceID = (String) ChainContextHolder.get(ChainKeyEnum.TRACE_ID);
         if (StringUtils.isEmpty(traceID)) {
-            logger.error("ERROR BEFORE CHAIN PROCESS");
+            logger.error("ERROR BEFORE CHAIN PROCESS:" + "[" +
+                    new StringBuilder().append("Caused by:")
+                            .append(e.getCause())
+                            .append("::")
+                            .append("Message:")
+                            .append(e.getMessage())
+                            .append("]")
+                            .toString()
+            );
             return;
         }
         String spanID = (String) ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
@@ -86,7 +95,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
                 exceptionDetail.append(header.toUpperCase())
                         .append("-")
                         .append(value)
-                        .append(" ");
+                        .append("::");
             }
         });
         logger.error(exceptionDetail.append("ERROR_METHOD-").append(errorMethod).toString());

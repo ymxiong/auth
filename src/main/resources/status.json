@@ -1,0 +1,55 @@
+{
+  "name": "STATUS_BASE",
+  "type": "status",
+  "id": "STATUS_BASE",
+  "errors": [
+    {
+      "id": "SUCCESS",
+      "name": "SUCCESS",
+      "code": 200,
+      "message": "请求成功"
+    },
+    {
+      "id": "FAILED",
+      "name": "FAILED",
+      "code": 700,
+      "message": "请求失败"
+    },
+    {
+      "id": "NO_AUTH",
+      "name": "NO_AUTH",
+      "code": 401,
+      "message": "权限不足"
+    },
+    {
+      "id": "NO_RECOGNIZE",
+      "name": "NO_RECOGNIZE",
+      "code": 1000,
+      "message": "错误未识别"
+    },
+    {
+      "id": "EXP_ERROR",
+      "name": "EXP_ERROR",
+      "code": 800,
+      "message": "表达式错误"
+    },
+    {
+      "id": "SERVICE_ERROR",
+      "name": "SERVICE_ERROR",
+      "code": 701,
+      "message": "服务调用错误"
+    },
+    {
+      "id": "CHAIN_ERROR",
+      "name": "CHAIN_ERROR",
+      "code": 725,
+      "message": "链路错误"
+    },
+    {
+      "id": "CHAIN_PARSE_ERROR",
+      "name": "CHAIN_PARSE_ERROR",
+      "code": 726,
+      "message": "链路转化错误"
+    }
+  ]
+}
