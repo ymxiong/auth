@@ -1,6 +1,7 @@
 package cc.eamon.open.status;
 
 import cc.eamon.easyfile.FileTools;
+import cc.eamon.open.status.config.StatusConfig;
 import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.util.Assert;
 
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Properties;
 
 public class StatusCode {
 
@@ -22,6 +20,7 @@ public class StatusCode {
      * 请求成功
      */
     public static int SUCCESS = 200;
+
     /**
      * 简单请求成功消息
      */
@@ -77,15 +76,13 @@ public class StatusCode {
         Resource resource = new ClassPathResource("status.json");
         try {
             String statusJsonString = FileTools.inputStream2Str(resource.getInputStream());
-            JSONObject statusJson = (JSONObject) JSONObject.parse(statusJsonString);
-            Assert.isTrue("status".equals(statusJson.getString("type")), "status.json 加载错误(type is not status)");
-            logger.info("CURRENT STATUS: " + statusJson.getString("name"));
-            statusJson.getJSONArray("errors").forEach((e) -> {
-                JSONObject error = (JSONObject) e;
+            StatusConfig statusConfig = JSONObject.parseObject(statusJsonString, StatusConfig.class);
+            Assert.isTrue("status".equals(statusConfig.getType()), "status.json 加载错误(type is not status)");
+            statusConfig.getErrors().forEach((error) -> {
                 StatusCode statusCode = new StatusCode();
-                statusCode.code = error.getInteger("code");
-                statusCode.msg = error.getString("message");
-                String id = error.getString("id");
+                String id = error.getId();
+                statusCode.code = error.getCode();
+                statusCode.msg = error.getMessage();
                 switch (id) {
                     case "SUCCESS":
                         SUCCESS = statusCode.code;
@@ -107,8 +104,6 @@ public class StatusCode {
                 codeToCodeMap.put(statusCode.code, statusCode);
                 Assert.isTrue(errorNameToCodeMap.size() == codeToCodeMap.size(), "status.json 加载错误(codes do not match error)");
             });
-
-
         } catch (Exception e) {
             logger.error("status.json 加载错误");
         }
