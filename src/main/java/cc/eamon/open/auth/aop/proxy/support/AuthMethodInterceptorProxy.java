@@ -22,8 +22,6 @@ public class AuthMethodInterceptorProxy extends BaseInterceptorProxy implements 
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        this.clearMethodInterceptors();
-
         cc.eamon.open.auth.aop.interceptor.MethodInterceptor interceptor = null;
         for (Annotation annotation : invocation.getMethod().getAnnotations()) {
             AuthEnums authEnum = AuthEnums.getEnumByAnnotationClass(annotation);

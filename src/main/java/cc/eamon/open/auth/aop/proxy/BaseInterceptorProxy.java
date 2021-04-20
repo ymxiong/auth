@@ -19,7 +19,7 @@ import java.util.Collection;
  */
 public abstract class BaseInterceptorProxy implements MethodInterceptor {
 
-    private Collection<MethodInterceptor> methodInterceptors = new ArrayList<>();
+    private ThreadLocal<Collection<MethodInterceptor>> methodInterceptors = null;
 
     private Authenticator authenticator;
 
@@ -31,14 +31,15 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         AuthenticatorHolder.set(authenticator);
         this.assertAuthorized(methodInvocation);
+        this.clearMethodInterceptors();
         return methodInvocation.proceed();
     }
 
     @Override
     public void assertAuthorized(MethodInvocation methodInvocation) {
-        if (CollectionUtils.isEmpty(methodInterceptors)) return;
+        if (CollectionUtils.isEmpty(methodInterceptors.get())) return;
 
-        for (MethodInterceptor interceptor : methodInterceptors) {
+        for (MethodInterceptor interceptor : methodInterceptors.get()) {
             if (interceptor.supports(methodInvocation)) {
                 interceptor.assertAuthorized(methodInvocation);
             }
@@ -57,11 +58,12 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
     }
 
     protected void addMethodInterceptors(MethodInterceptor... methodInterceptors) {
-        this.methodInterceptors.addAll(Arrays.asList(methodInterceptors));
+        this.methodInterceptors = ThreadLocal.withInitial(ArrayList::new);
+        this.methodInterceptors.get().addAll(Arrays.asList(methodInterceptors));
     }
 
     protected void clearMethodInterceptors() {
-        this.methodInterceptors.clear();
+        this.methodInterceptors.remove();
     }
 
 }
