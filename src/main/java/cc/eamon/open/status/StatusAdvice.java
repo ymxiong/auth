@@ -36,7 +36,9 @@ public abstract class StatusAdvice implements ErrorDecoder {
         Status.Builder builder;
         if (e instanceof StatusException) {
             StatusException exception = (StatusException) e;
-            logger.error("error detail:" + exception.getDetail());
+            if (!StringUtils.isEmpty(exception.getDetail())) {
+                logger.error("error detail:" + exception.getDetail());
+            }
             if (setResponseStatus()) response.setStatus(exception.getCode());
             builder = Status.failedBuilder(exception);
         } else if (e instanceof RuntimeException) {
