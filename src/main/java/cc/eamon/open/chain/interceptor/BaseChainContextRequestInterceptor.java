@@ -33,7 +33,13 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
     }
 
 
-    //模板方法
+    /**
+     * 模板方法
+     * 1. 设置线程counter
+     * 2. 转换chainContext
+     * 3. 添加chainContext
+     * 4. 校验chainContext
+     */
     public void applyChainContextPreProcess() {
         this.setThreadCounter();
         parseChainContext();

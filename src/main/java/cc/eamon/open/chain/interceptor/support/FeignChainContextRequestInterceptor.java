@@ -15,11 +15,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 /**
+ * 适配feign
+ *
  * Author: Zhu yuhan
  * Email: zhuyuhan2333@qq.com
  * Date: 2020/12/4 21:00
  **/
-//适配feign
 public abstract class FeignChainContextRequestInterceptor extends BaseChainContextRequestInterceptor implements RequestInterceptor {
 
     @Override
