@@ -1,9 +1,9 @@
-package cc.eamon.open.chain.temp;
+package cc.eamon.open.chain.interceptor.support;
 
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.processor.ChainKeyProcessor;
 import cc.eamon.open.chain.processor.metadata.ChainKeyProcessorMetadata;
-import cc.eamon.open.error.Assert;
+import cc.eamon.open.status.StatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -36,7 +36,7 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
             try {
                 processor = processorClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                Assert.notNull(null, "CHAIN_ERROR");
+                throw new StatusException("CHAIN_ERROR");
             }
             //parse header to chainContext
             String value = Optional.ofNullable(request.getHeader(header)).orElse(request.getParameter(header));
@@ -60,7 +60,7 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
             try {
                 chainKeyProcessor = keyProcessorClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
-                Assert.notNull(null, "CHAIN_ERROR");
+                throw new StatusException("CHAIN_ERROR");
             }
             chainKeyProcessor.init();
         }

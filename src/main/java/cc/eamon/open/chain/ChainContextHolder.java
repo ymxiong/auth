@@ -1,6 +1,7 @@
 package cc.eamon.open.chain;
 
 import cc.eamon.open.chain.processor.ChainKeyEnum;
+import cc.eamon.open.status.StatusException;
 
 /**
  * Author: eamon
@@ -34,6 +35,12 @@ public class ChainContextHolder {
 
     public static Object get(ChainKeyEnum chainKeyEnum) {
         return ChainContextHolder.get().get(chainKeyEnum.getKey());
+    }
+
+    public static String getString(String key) {
+        Object value = get(key);
+        if (value instanceof String || value == null) return (String) value;
+        throw new StatusException("CHAIN_ERROR");
     }
 
     public static void put(String key, Object value) {

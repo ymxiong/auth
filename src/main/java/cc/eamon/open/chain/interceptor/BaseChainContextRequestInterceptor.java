@@ -47,7 +47,7 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         addChainContext(request);
-        if (!checkChainContext()) Assert.notNull(null, "CHAIN_ERROR");
+        if (!checkChainContext()) throw new StatusException("CHAIN_ERROR");
     }
 
     @Override
