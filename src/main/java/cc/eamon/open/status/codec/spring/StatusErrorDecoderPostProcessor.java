@@ -1,6 +1,8 @@
-package cc.eamon.open.status.codec;
+package cc.eamon.open.status.codec.spring;
 
 import cc.eamon.open.status.StatusUtils;
+import cc.eamon.open.status.codec.ErrorHandler;
+import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.support.StatusErrorDecoder;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
