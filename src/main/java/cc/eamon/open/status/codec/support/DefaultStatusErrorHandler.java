@@ -35,7 +35,7 @@ public class DefaultStatusErrorHandler implements StatusErrorHandler {
         try {
             exception = exceptionClass.getDeclaredConstructor(String.class).newInstance(exceptionMessage);
         } catch (Exception e) {
-            // no option
+            // no op
         }
         if (StatusException.class.isAssignableFrom(exceptionClass)) {
             StatusException statusException = (StatusException) exception;

@@ -58,7 +58,6 @@ public class StatusDecoder extends Decoder.Default {
         String message = responseMapJson.getString(StatusConstants.MESSAGE_KEY);
         ChainContextHolder.put(StatusConstants.MESSAGE_KEY, message);
         if (this.hasException(statusString, message, status)) {
-            // TODO 异常decode逻辑， 须开放定制
             Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
             if (!(statusChainMethod instanceof Method))
                 throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DEFAULT_MESSAGE, StatusConstants.DECODE_ERROR_MESSAGE_DETAIL);

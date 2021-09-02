@@ -11,8 +11,10 @@ import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Author: Zhu yuhan
@@ -43,36 +45,12 @@ public class StatusErrorDecoder implements ErrorDecoder {
      */
     @Override
     public Exception decode(String errorMethod, Response response) {
-        StringBuilder exceptionDetail = new StringBuilder();
-        Map<String, Collection<String>> headers = response.headers();
-        headers.forEach((header, values) -> {
-            if (ChainKeyEnum.isChainKey(header.toUpperCase())) {
-                Collection<String> collection = headers.get(header);
-                String value = (String) ((List) collection).get(0);
-                exceptionDetail.append(header.toUpperCase())
-                        .append("-")
-                        .append(value)
-                        .append("::");
-            }
-        });
-        logger.error(exceptionDetail.append("ERROR_METHOD-").append(errorMethod).toString());
+        String errorDecodeDetail = this.getErrorDecodeDetail(errorMethod, response);
+        logger.error(errorDecodeDetail);
         //识别异常
-        StatusException statusException = new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DEFAULT_MESSAGE, exceptionDetail.toString());
+        StatusException statusException = new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DEFAULT_MESSAGE, errorDecodeDetail);
         try {
-            // TODO 转化异常，结合定制
             return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(errorMethod, response));
-//            String exceptionContent = Util.toString(response.body().asReader());
-//            if (StringUtils.isEmpty(exceptionContent)) return statusException;
-//            exceptionContent = exceptionContent.replaceAll("\n", "").replaceAll("\t", "");
-//
-//            JSONObject responseJson = (JSONObject) JSON.parse(exceptionContent);
-//            if (responseJson == null) return statusException;
-//            int code = Integer.parseInt(responseJson.getString(StatusConstants.STATUS_KEY));
-//            String msg = responseJson.getString(StatusConstants.MESSAGE_KEY);
-//            if (!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)) {
-//                statusException = new StatusException(code, msg, exceptionDetail.toString());
-//            }
-//            return statusException;
         } catch (Exception e) {
             logger.error(StatusConstants.DECODE_ERROR_MESSAGE_DETAIL, e);
             return statusException;
@@ -87,18 +65,22 @@ public class StatusErrorDecoder implements ErrorDecoder {
         return errorKeyToExceptionMap;
     }
 
-    /**
-     * get feign client method error decode key
-     * exp:
-     *
-     * @param statusString
-     * @param message
-     * @return
-     */
-    public static String decodeErrorKey(String statusString, Method method, String message) {
-        StringJoiner sj = new StringJoiner("-");
-        sj.add(method.toString())
-                .add(statusString);
-        return sj.toString();
+    private String getErrorDecodeDetail(String errorMethod, Response response) {
+        StringBuilder exceptionDetail = new StringBuilder();
+        Map<String, Collection<String>> headers = response.headers();
+        headers.forEach((header, values) -> {
+            if (ChainKeyEnum.isChainKey(header.toUpperCase())) {
+                Collection<String> collection = headers.get(header);
+                String value = (String) ((List) collection).get(0);
+                exceptionDetail.append(header.toUpperCase())
+                        .append("-")
+                        .append(value)
+                        .append("::");
+            }
+        });
+        return exceptionDetail.append("ERROR_METHOD-")
+                .append(errorMethod)
+                .toString();
     }
+
 }
