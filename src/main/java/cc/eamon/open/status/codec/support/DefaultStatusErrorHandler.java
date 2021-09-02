@@ -22,7 +22,9 @@ public class DefaultStatusErrorHandler implements StatusErrorHandler {
         if (StringUtils.isEmpty(errorMethodKey) || (errorInstance = StatusErrorDecoder.getErrorKeyToExceptionMap().get(errorMethodKey)) == null) {
             // default
             String chainContextMessage = ChainContextHolder.getString(StatusConstants.MESSAGE_KEY);
-            return new StatusException(StatusConstants.DEFAULT_CODE,
+            String status = ChainContextHolder.getString(StatusConstants.STATUS_KEY);
+            return new StatusException(this.validStatusCode(status) ?
+                    Integer.parseInt(status) : StatusConstants.DEFAULT_CODE,
                     chainContextMessage == null ? StatusConstants.DEFAULT_MESSAGE : chainContextMessage);
         }
         Class<? extends Exception> exceptionClass = errorInstance.decodeException();
@@ -44,5 +46,12 @@ public class DefaultStatusErrorHandler implements StatusErrorHandler {
             return statusException;
         }
         return exception;
+    }
+
+    private boolean validStatusCode(String status) {
+        if (StringUtils.isEmpty(status)) return false;
+        int code = Integer.parseInt(status);
+        if (code >= 200 && code < 300) return false;
+        return true;
     }
 }

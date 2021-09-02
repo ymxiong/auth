@@ -5,11 +5,10 @@ import cc.eamon.open.status.StatusConstants;
 import cc.eamon.open.status.StatusException;
 import cc.eamon.open.status.StatusUtils;
 import cc.eamon.open.status.codec.StatusErrorHandler;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import cc.eamon.open.status.codec.aop.DecoderPreHandle;
+import cc.eamon.open.status.codec.aop.support.StatusDecoderPreHandle;
 import feign.FeignException;
 import feign.Response;
-import feign.Util;
 import feign.codec.DecodeException;
 import feign.codec.Decoder;
 import org.springframework.util.StringUtils;
@@ -27,11 +26,14 @@ public class StatusDecoder extends Decoder.Default {
 
     private StatusErrorHandler statusErrorHandler;
 
+    private DecoderPreHandle decoderPreHandle;
+
     private StatusDecoder() {
     }
 
     public StatusDecoder(StatusErrorHandler statusErrorHandler) {
         this.statusErrorHandler = statusErrorHandler;
+        this.decoderPreHandle = new StatusDecoderPreHandle();
     }
 
     /**
@@ -46,21 +48,15 @@ public class StatusDecoder extends Decoder.Default {
      */
     @Override
     public Object decode(Response response, Type type) throws IOException, DecodeException, FeignException {
-        if (response == null || response.body() == null) return null;
-        Response.Body body = response.body();
-        int status = response.status();
+        this.decoderPreHandle.preHandle(response);
 
-        String responseMap = Util.toString(body.asReader());
-        JSONObject responseMapJson = JSON.parseObject(responseMap);
-        String statusString = responseMapJson.getString(StatusConstants.STATUS_KEY);
-        // 防止多次解析response
-        ChainContextHolder.put(StatusConstants.STATUS_KEY, statusString);
-        String message = responseMapJson.getString(StatusConstants.MESSAGE_KEY);
-        ChainContextHolder.put(StatusConstants.MESSAGE_KEY, message);
+        int status = response.status();
+        String statusString = ChainContextHolder.getString(StatusConstants.STATUS_KEY);
+        String message = ChainContextHolder.getString(StatusConstants.MESSAGE_KEY);
         if (this.hasException(statusString, message, status)) {
             Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
             if (!(statusChainMethod instanceof Method))
-                throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DEFAULT_MESSAGE, StatusConstants.DECODE_ERROR_MESSAGE_DETAIL);
+                throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DECODE_ERROR_DECODE_MESSAGE);
             return this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey((Method) statusChainMethod, statusString, message));
         }
         // 兼容feign低版本逻辑，防止文件等异常

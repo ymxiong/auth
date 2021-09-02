@@ -1,11 +1,11 @@
 package cc.eamon.open.status.codec.support;
 
 import cc.eamon.open.chain.processor.ChainKeyEnum;
-import cc.eamon.open.status.StatusConstants;
-import cc.eamon.open.status.StatusException;
 import cc.eamon.open.status.StatusUtils;
 import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.StatusErrorHandler;
+import cc.eamon.open.status.codec.aop.DecoderPreHandle;
+import cc.eamon.open.status.codec.aop.support.StatusErrorDecoderPreHandle;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
@@ -29,11 +29,14 @@ public class StatusErrorDecoder implements ErrorDecoder {
 
     private StatusErrorHandler statusErrorHandler;
 
+    private DecoderPreHandle decoderPreHandle;
+
     private StatusErrorDecoder() {
     }
 
     public StatusErrorDecoder(StatusErrorHandler statusErrorHandler) {
         this.statusErrorHandler = statusErrorHandler;
+        this.decoderPreHandle = new StatusErrorDecoderPreHandle();
     }
 
     /**
@@ -45,16 +48,9 @@ public class StatusErrorDecoder implements ErrorDecoder {
      */
     @Override
     public Exception decode(String errorMethod, Response response) {
-        String errorDecodeDetail = this.getErrorDecodeDetail(errorMethod, response);
-        logger.error(errorDecodeDetail);
-        //识别异常
-        StatusException statusException = new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DEFAULT_MESSAGE, errorDecodeDetail);
-        try {
-            return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(errorMethod, response));
-        } catch (Exception e) {
-            logger.error(StatusConstants.DECODE_ERROR_MESSAGE_DETAIL, e);
-            return statusException;
-        }
+        this.decoderPreHandle.preHandle(response);
+        logger.error(this.getErrorDecodeDetailLog(errorMethod, response));
+        return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(errorMethod, response));
     }
 
     public static void addStatusMetadata(String errorKey, ErrorInstance errorInstance) {
@@ -65,7 +61,7 @@ public class StatusErrorDecoder implements ErrorDecoder {
         return errorKeyToExceptionMap;
     }
 
-    private String getErrorDecodeDetail(String errorMethod, Response response) {
+    private String getErrorDecodeDetailLog(String errorMethod, Response response) {
         StringBuilder exceptionDetail = new StringBuilder();
         Map<String, Collection<String>> headers = response.headers();
         headers.forEach((header, values) -> {

@@ -11,9 +11,13 @@ public class StatusConstants {
 
     public static final String STATUS_KEY = "status";
 
+    public static final String MESSAGE_DETAIL_KEY = "message-detail";
+
     public static final String DEFAULT_MESSAGE = "rpc error";
 
-    public static final String DECODE_ERROR_MESSAGE_DETAIL = "rpc exception decode error";
+    public static final String DEFAULT_DECODE_MESSAGE = "rpc decode error";
+
+    public static final String DECODE_ERROR_DECODE_MESSAGE = "rpc exception decode error";
 
     public static final Integer DEFAULT_CODE = 701;
 
