@@ -1,4 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration = \
-  cc.eamon.open.status.codec.spring.StatusErrorDecoderPostProcessor,\
-  cc.eamon.open.status.codec.aop.StatusChainAspect,\
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   cc.eamon.open.status.codec.spring.StatusAutoConfiguration

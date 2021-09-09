@@ -45,7 +45,7 @@ public class StatusUtils {
         return generateErrorMethodKey(Feign.configKey(method.getDeclaringClass(), method), status);
     }
 
-    private static String generateErrorMethodKey(String feignErrorMethod, String status) {
+    public static String generateErrorMethodKey(String feignErrorMethod, String status) {
         return feignErrorMethod + "-" + status;
     }
 }

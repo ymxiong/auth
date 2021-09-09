@@ -5,7 +5,6 @@ import cc.eamon.open.status.codec.ErrorHandler;
 import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.support.StatusErrorDecoder;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import java.lang.reflect.Method;
@@ -15,11 +14,10 @@ import java.lang.reflect.Method;
  * Email: zhuyuhan2333@qq.com
  * Date: 2021/9/1 12:59
  **/
-public class StatusErrorDecoderPostProcessor implements BeanPostProcessor {
+public class StatusErrorDecoderRegistrar {
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Class<?> beanClass = bean.getClass();
+    public void register(Class<?> target) throws BeansException {
+        Class<?> beanClass = target;
         if (beanClass.isAnnotationPresent(FeignClient.class)) {
             if (beanClass.isAnnotationPresent(ErrorHandler.class)) {
                 ErrorHandler errorHandler = beanClass.getAnnotation(ErrorHandler.class);
@@ -31,7 +29,6 @@ public class StatusErrorDecoderPostProcessor implements BeanPostProcessor {
                 }
             }
         }
-        return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
     }
 
     private void parseErrorHandler(Method method, ErrorHandler errorHandler) {
@@ -65,4 +62,5 @@ public class StatusErrorDecoderPostProcessor implements BeanPostProcessor {
             StatusErrorDecoder.addStatusMetadata(errorKey, errorInstance);
         }
     }
+
 }

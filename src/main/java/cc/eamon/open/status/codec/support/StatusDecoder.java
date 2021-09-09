@@ -47,7 +47,7 @@ public class StatusDecoder extends Decoder.Default {
      * @throws FeignException
      */
     @Override
-    public Object decode(Response response, Type type) throws IOException, DecodeException, FeignException {
+    public Object decode(Response response, Type type) throws IOException, RuntimeException {
         this.decoderPreHandle.preHandle(response);
 
         int status = response.status();
@@ -57,7 +57,8 @@ public class StatusDecoder extends Decoder.Default {
             Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
             if (!(statusChainMethod instanceof Method))
                 throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DECODE_ERROR_DECODE_MESSAGE);
-            return this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey((Method) statusChainMethod, statusString, message));
+            // TODO NEED FIX WITH FEIGN CORE
+            throw (RuntimeException) this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey((Method) statusChainMethod, statusString, message));
         }
         // 兼容feign低版本逻辑，防止文件等异常
         return super.decode(response, type);

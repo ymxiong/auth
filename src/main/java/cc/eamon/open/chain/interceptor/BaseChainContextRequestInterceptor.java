@@ -18,8 +18,23 @@ import javax.servlet.http.HttpServletRequest;
  **/
 public abstract class BaseChainContextRequestInterceptor implements RequestInterceptor {
 
-    private void setThreadCounter() {
-        ChainContextHolder.put(ChainKeyEnum.THREAD_COUNTER, ((Integer) ChainContextHolder.get(ChainKeyEnum.THREAD_COUNTER)) + 1);
+    /**
+     * 模板方法
+     * 1. 设置线程counter
+     * 2. 应用chainContext
+     * 3. 转换chainContext
+     * 4. 添加chainContext
+     * 5. 校验chainContext
+     */
+    public void applyChainContextPreProcess() {
+        this.setThreadCounter();
+        this.applyChainContext();
+        parseChainContext();
+        //添加链路数据
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        addChainContext(request);
+        if (!checkChainContext()) throw new StatusException("CHAIN_ERROR");
     }
 
     @Override
@@ -33,34 +48,17 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
     }
 
 
-    /**
-     * 模板方法
-     * 1. 设置线程counter
-     * 2. 转换chainContext
-     * 3. 添加chainContext
-     * 4. 校验chainContext
-     */
-    public void applyChainContextPreProcess() {
-        this.setThreadCounter();
-        parseChainContext();
-        //添加链路数据
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletRequest request = servletRequestAttributes.getRequest();
-        addChainContext(request);
-        if (!checkChainContext()) throw new StatusException("CHAIN_ERROR");
-    }
-
     @Override
     public void applyChainContext() {
-
+        this.applyStatusChainContext();
     }
 
-//    //被调用服务调用该方法
+
+    //    //被调用服务调用该方法
 //    protected void parseChainContextHandle(String key1, Class type1, String key2, Class type2, ChainKeyParser chainKeyParser, ChainKeyProcessor chainKeyProcessor){
 //        this.parseChainContext(key1, type1, key2, type2, chainKeyParser);
 //
 //    }
-
     protected void parseChainContext(String chainKey1, Class type1, String chainKey2, Class type2, ChainKeyParser chainKeyParser) {
         if (ChainKeyEnum.isDefaultChainKey(chainKey1) || ChainKeyEnum.isDefaultChainKey(chainKey2))
             throw new StatusException(727, "can't parse default CHAIN-KEY");
@@ -85,11 +83,23 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
     }
 
     //同一数据类型换名
+
     protected void parseChainContext(String chainKey1, String chainKey2) {
         this.parseChainContext(chainKey1, null, chainKey2, null, null);
     }
 
     public abstract void parseChainContext();
+
+    /**
+     * TODO NEED FIX 塞入feignClient method到ChainContext
+     */
+    private void applyStatusChainContext() {
+
+    }
+
+    private void setThreadCounter() {
+        ChainContextHolder.put(ChainKeyEnum.THREAD_COUNTER, ((Integer) ChainContextHolder.get(ChainKeyEnum.THREAD_COUNTER)) + 1);
+    }
 
 
 }
