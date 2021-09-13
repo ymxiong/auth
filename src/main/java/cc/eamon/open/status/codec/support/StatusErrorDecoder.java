@@ -1,16 +1,18 @@
 package cc.eamon.open.status.codec.support;
 
 import cc.eamon.open.chain.processor.ChainKeyEnum;
-import cc.eamon.open.status.StatusUtils;
 import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.StatusErrorHandler;
 import cc.eamon.open.status.codec.aop.DecoderPreHandle;
 import cc.eamon.open.status.codec.aop.support.StatusErrorDecoderPreHandle;
+import cc.eamon.open.status.util.StatusUtils;
+import feign.Request;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,8 @@ public class StatusErrorDecoder implements ErrorDecoder {
     private static Logger logger = LoggerFactory.getLogger(StatusErrorDecoder.class);
 
     private static Map<String, ErrorInstance> errorKeyToExceptionMap = new HashMap<>(64);
+
+    private static Map<String, Method> invokeKeyToMethodMap = new HashMap<>(64);
 
     private StatusErrorHandler statusErrorHandler;
 
@@ -50,11 +54,26 @@ public class StatusErrorDecoder implements ErrorDecoder {
     public Exception decode(String errorMethod, Response response) {
         this.decoderPreHandle.preHandle(response);
         logger.error(this.getErrorDecodeDetailLog(errorMethod, response));
-        return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(errorMethod, response));
+
+        Request request = response.request();
+        String url = request.url();
+        Request.HttpMethod httpMethod = request.httpMethod();
+
+        url = StatusUtils.getActualUrl(url);
+
+        return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(url + httpMethod.name(), response));
     }
 
     public static void addStatusMetadata(String errorKey, ErrorInstance errorInstance) {
         errorKeyToExceptionMap.put(errorKey, errorInstance);
+    }
+
+    public static void addStatusMetadata(String invokeKey, Method method) {
+        invokeKeyToMethodMap.put(invokeKey, method);
+    }
+
+    public static Map<String, Method> getInvokeKeyToMethodMap() {
+        return invokeKeyToMethodMap;
     }
 
     public static Map<String, ErrorInstance> getErrorKeyToExceptionMap() {

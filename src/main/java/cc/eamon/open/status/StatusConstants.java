@@ -24,4 +24,6 @@ public class StatusConstants {
     public static final String DEFAULT_ID = "NO_RECOGNIZE_MSG";
 
     public static final String STATUS_CHAIN_RPC_KEY = "RPC-KEY";
+
+    public static final String STATUS_CHAIN_RPC_SUB_KEY = "RPC-SUB-KEY";
 }

@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Import;
  * Date: 2021/9/2 11:38
  **/
 @Configuration
-@Import(StatusErrorDecoderRegistrar.class)
+@Import({StatusErrorDecoderRegistrar.class, StatusRegistrarRunner.class})
 public class StatusAutoConfiguration {
 
     @Autowired

@@ -1,12 +1,14 @@
-package cc.eamon.open.status;
+package cc.eamon.open.status.util;
 
 import cc.eamon.open.chain.ChainContextHolder;
+import cc.eamon.open.status.StatusConstants;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import feign.Feign;
 import feign.Response;
 import feign.Util;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -41,11 +43,29 @@ public class StatusUtils {
         return generateErrorMethodKey(feignErrorMethod, "" + code);
     }
 
-    public static String generateErrorMethodKey(Method method, String status, String message) {
-        return generateErrorMethodKey(Feign.configKey(method.getDeclaringClass(), method), status);
+    public static String generateErrorMethodKey(Method method, String status, String message, String baseUrl) {
+        String url = baseUrl;
+        RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
+        String[] value = requestMapping.value();
+        RequestMethod[] requestMethods = requestMapping.method();
+        if (value.length != 0) {
+            url += value[0];
+        }
+        if (requestMethods.length != 0) {
+            url += requestMethods[0].name();
+        }
+//        return generateErrorMethodKey(Feign.configKey(method.getDeclaringClass(), method), status);
+        return generateErrorMethodKey(url, status);
     }
 
-    public static String generateErrorMethodKey(String feignErrorMethod, String status) {
-        return feignErrorMethod + "-" + status;
+    public static String generateErrorMethodKey(String feignErrorMethodUrl, String status) {
+        return feignErrorMethodUrl + "-" + status;
+    }
+
+    public static String getActualUrl(String url) {
+        url = url.substring(7);
+        url = url.substring(url.indexOf("/") + 1);
+        String subUrl = ChainContextHolder.getString(StatusConstants.STATUS_CHAIN_RPC_SUB_KEY);
+        return url.substring(0, url.lastIndexOf(subUrl)) + subUrl;
     }
 }

@@ -50,7 +50,7 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
 
     @Override
     public void applyChainContext() {
-        this.applyStatusChainContext();
+
     }
 
 
@@ -89,13 +89,6 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
     }
 
     public abstract void parseChainContext();
-
-    /**
-     * TODO NEED FIX 塞入feignClient method到ChainContext
-     */
-    private void applyStatusChainContext() {
-
-    }
 
     private void setThreadCounter() {
         ChainContextHolder.put(ChainKeyEnum.THREAD_COUNTER, ((Integer) ChainContextHolder.get(ChainKeyEnum.THREAD_COUNTER)) + 1);

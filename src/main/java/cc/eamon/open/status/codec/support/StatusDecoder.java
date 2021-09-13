@@ -3,18 +3,18 @@ package cc.eamon.open.status.codec.support;
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.status.StatusConstants;
 import cc.eamon.open.status.StatusException;
-import cc.eamon.open.status.StatusUtils;
 import cc.eamon.open.status.codec.StatusErrorHandler;
 import cc.eamon.open.status.codec.aop.DecoderPreHandle;
 import cc.eamon.open.status.codec.aop.support.StatusDecoderPreHandle;
+import cc.eamon.open.status.util.StatusUtils;
 import feign.FeignException;
+import feign.Request;
 import feign.Response;
 import feign.codec.DecodeException;
 import feign.codec.Decoder;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
@@ -50,15 +50,21 @@ public class StatusDecoder extends Decoder.Default {
     public Object decode(Response response, Type type) throws IOException, RuntimeException {
         this.decoderPreHandle.preHandle(response);
 
+        Request request = response.request();
+        String url = request.url();
+        Request.HttpMethod httpMethod = request.httpMethod();
+
+        url = StatusUtils.getActualUrl(url);
+
         int status = response.status();
         String statusString = ChainContextHolder.getString(StatusConstants.STATUS_KEY);
         String message = ChainContextHolder.getString(StatusConstants.MESSAGE_KEY);
         if (this.hasException(statusString, message, status)) {
-            Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
-            if (!(statusChainMethod instanceof Method))
+//            Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
+            if (StringUtils.isEmpty(url))
                 throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DECODE_ERROR_DECODE_MESSAGE);
             // TODO NEED FIX WITH FEIGN CORE
-            throw (RuntimeException) this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey((Method) statusChainMethod, statusString, message));
+            throw (RuntimeException) this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(url + httpMethod.name(), statusString));
         }
         // 兼容feign低版本逻辑，防止文件等异常
         return super.decode(response, type);
