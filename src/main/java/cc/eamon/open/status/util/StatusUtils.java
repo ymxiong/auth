@@ -49,7 +49,7 @@ public class StatusUtils {
         String[] value = requestMapping.value();
         RequestMethod[] requestMethods = requestMapping.method();
         if (value.length != 0) {
-            url += value[0];
+            url += ("/" + value[0]);
         }
         if (requestMethods.length != 0) {
             url += requestMethods[0].name();

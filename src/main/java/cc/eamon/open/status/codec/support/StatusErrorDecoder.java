@@ -1,12 +1,13 @@
 package cc.eamon.open.status.codec.support;
 
+import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
+import cc.eamon.open.status.StatusConstants;
 import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.StatusErrorHandler;
 import cc.eamon.open.status.codec.aop.DecoderPreHandle;
 import cc.eamon.open.status.codec.aop.support.StatusErrorDecoderPreHandle;
 import cc.eamon.open.status.util.StatusUtils;
-import feign.Request;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
@@ -55,13 +56,7 @@ public class StatusErrorDecoder implements ErrorDecoder {
         this.decoderPreHandle.preHandle(response);
         logger.error(this.getErrorDecodeDetailLog(errorMethod, response));
 
-        Request request = response.request();
-        String url = request.url();
-        Request.HttpMethod httpMethod = request.httpMethod();
-
-        url = StatusUtils.getActualUrl(url);
-
-        return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(url + httpMethod.name(), response));
+        return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(ChainContextHolder.getString(StatusConstants.STATUS_CHAIN_RPC_KEY), response));
     }
 
     public static void addStatusMetadata(String errorKey, ErrorInstance errorInstance) {

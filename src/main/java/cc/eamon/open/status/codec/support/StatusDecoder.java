@@ -8,7 +8,6 @@ import cc.eamon.open.status.codec.aop.DecoderPreHandle;
 import cc.eamon.open.status.codec.aop.support.StatusDecoderPreHandle;
 import cc.eamon.open.status.util.StatusUtils;
 import feign.FeignException;
-import feign.Request;
 import feign.Response;
 import feign.codec.DecodeException;
 import feign.codec.Decoder;
@@ -50,21 +49,15 @@ public class StatusDecoder extends Decoder.Default {
     public Object decode(Response response, Type type) throws IOException, RuntimeException {
         this.decoderPreHandle.preHandle(response);
 
-        Request request = response.request();
-        String url = request.url();
-        Request.HttpMethod httpMethod = request.httpMethod();
-
-        url = StatusUtils.getActualUrl(url);
-
         int status = response.status();
         String statusString = ChainContextHolder.getString(StatusConstants.STATUS_KEY);
         String message = ChainContextHolder.getString(StatusConstants.MESSAGE_KEY);
         if (this.hasException(statusString, message, status)) {
-//            Object statusChainMethod = ChainContextHolder.get(StatusConstants.STATUS_CHAIN_RPC_KEY);
-            if (StringUtils.isEmpty(url))
+            String rpcKey = ChainContextHolder.getString(StatusConstants.STATUS_CHAIN_RPC_KEY);
+            if (StringUtils.isEmpty(rpcKey))
                 throw new StatusException(StatusConstants.DEFAULT_CODE, StatusConstants.DECODE_ERROR_DECODE_MESSAGE);
             // TODO NEED FIX WITH FEIGN CORE
-            throw (RuntimeException) this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(url + httpMethod.name(), statusString));
+            throw (RuntimeException) this.statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(rpcKey, statusString));
         }
         // 兼容feign低版本逻辑，防止文件等异常
         return super.decode(response, type);
