@@ -6,6 +6,7 @@ import cc.eamon.open.chain.parser.ChainKeyParser;
 import cc.eamon.open.chain.parser.map.UserGenericMap;
 import cc.eamon.open.chain.parser.metadata.ChainKeyParserMetadata;
 import cc.eamon.open.chain.parser.metadata.GenericChainKeyParserMetadata;
+import cc.eamon.open.status.StatusConstants;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -15,11 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Enumeration;
 
 /**
+ * 适配feign
+ * <p>
  * Author: Zhu yuhan
  * Email: zhuyuhan2333@qq.com
  * Date: 2020/12/4 21:00
  **/
-//适配feign
 public abstract class FeignChainContextRequestInterceptor extends BaseChainContextRequestInterceptor implements RequestInterceptor {
 
     @Override
@@ -60,6 +62,17 @@ public abstract class FeignChainContextRequestInterceptor extends BaseChainConte
                 chainKeyParser = ChainKeyParserMetadata.getChainKeyParser(chainClass);
             }
             requestTemplate.header(chainKey, chainKeyParser.encodeChainContext(chain));
+            this.applyStatusChainContext(requestTemplate);
         }
+    }
+
+    /**
+     * 塞入subUrl
+     */
+    private void applyStatusChainContext(RequestTemplate requestTemplate) {
+//        String invokeKey =
+//                requestTemplate.method() == null ? RequestMethod.GET.name() : requestTemplate.method()
+//                        + "-" + requestTemplate.path();
+        ChainContextHolder.put(StatusConstants.STATUS_CHAIN_RPC_SUB_KEY, requestTemplate.path());
     }
 }

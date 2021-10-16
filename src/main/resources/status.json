@@ -40,6 +40,11 @@
       "id": "CHAIN_PARSE_ERROR",
       "code": 726,
       "message": "链路转化错误"
+    },
+    {
+      "id": "STATUS_ERROR",
+      "code": 727,
+      "message": "状态处理错误"
     }
   ]
 }

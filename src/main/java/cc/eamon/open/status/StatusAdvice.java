@@ -2,11 +2,6 @@ package cc.eamon.open.status;
 
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.chain.processor.ChainKeyEnum;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import feign.Response;
-import feign.Util;
-import feign.codec.ErrorDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -15,15 +10,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
-public abstract class StatusAdvice implements ErrorDecoder {
+public abstract class StatusAdvice {
 
     private static Logger logger = LoggerFactory.getLogger(StatusAdvice.class);
-
-    public static final int SERVICE_ERROR = 701;
 
     /**
      * 全局异常处理
@@ -36,9 +27,16 @@ public abstract class StatusAdvice implements ErrorDecoder {
         Status.Builder builder;
         if (e instanceof StatusException) {
             StatusException exception = (StatusException) e;
-            logger.error("error detail:" + exception.getDetail());
-            if (setResponseStatus()) response.setStatus(exception.getCode());
-            builder = Status.failedBuilder(exception);
+            if (!StringUtils.isEmpty(exception.getDetail())) {
+                logger.error("error detail:" + exception.getDetail());
+            }
+            if (exception.isSetResponseStatus() || setResponseStatus()) {
+                response.setStatus(exception.getCode());
+                builder = Status.failedBuilder(exception);
+            } else {
+                // 200，内含错误
+                builder = Status.successFailedInnerBuilder(exception.toString());
+            }
         } else if (e instanceof RuntimeException) {
             if (setResponseStatus()) response.setStatus(700);
             builder = Status.failedBuilder().addMessage("[Runtime]" + e.getMessage());
@@ -66,7 +64,7 @@ public abstract class StatusAdvice implements ErrorDecoder {
         }
         String spanID = (String) ChainContextHolder.get(ChainKeyEnum.SPAN_ID);
         String parentID = ChainContextHolder.get(ChainKeyEnum.PARENT_ID) == null ? "" : (String) ChainContextHolder.get(ChainKeyEnum.PARENT_ID);
-        logger.error("SPAN => " + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
+        logger.error("SPAN-" + ChainKeyEnum.TRACE_ID.getKey() + "-" + traceID + "::"
                 + ChainKeyEnum.SPAN_ID.getKey() + "-" + spanID +
                 (StringUtils.isEmpty(parentID) ? "" : "::" + ChainKeyEnum.PARENT_ID.getKey() + "-" + parentID));
         response.addHeader(ChainKeyEnum.TRACE_ID.getKey(), traceID);
@@ -76,49 +74,5 @@ public abstract class StatusAdvice implements ErrorDecoder {
     }
 
     public abstract boolean setResponseStatus();
-
-    /**
-     * 跨服务异常捕获、解析和重抛，替换默认的feign异常处理
-     *
-     * @param errorMethod
-     * @param response
-     * @return
-     */
-    @Override
-    public Exception decode(String errorMethod, Response response) {
-        StringBuilder exceptionDetail = new StringBuilder();
-        Map<String, Collection<String>> headers = response.headers();
-        headers.forEach((header, values) -> {
-            if (ChainKeyEnum.isChainKey(header.toUpperCase())) {
-                Collection<String> collection = headers.get(header);
-                String value = (String) ((List) collection).get(0);
-                exceptionDetail.append(header.toUpperCase())
-                        .append("-")
-                        .append(value)
-                        .append("::");
-            }
-        });
-        logger.error(exceptionDetail.append("ERROR_METHOD-").append(errorMethod).toString());
-        //识别异常
-        StatusException statusException = new StatusException(SERVICE_ERROR, "远程服务调用异常", exceptionDetail.toString());
-        try {
-            //转化异常
-            String exceptionContent = Util.toString(response.body().asReader());
-            if (StringUtils.isEmpty(exceptionContent)) return statusException;
-            exceptionContent = exceptionContent.replaceAll("\n", "").replaceAll("\t", "");
-
-            JSONObject responseJson = (JSONObject) JSON.parse(exceptionContent);
-            if (responseJson == null) return statusException;
-            int code = Integer.parseInt(responseJson.getString("status"));
-            String msg = responseJson.getString("message");
-            if (!StringUtils.isEmpty(code) && !StringUtils.isEmpty(msg)) {
-                statusException = new StatusException(code, msg, exceptionDetail.toString());
-            }
-            return statusException;
-        } catch (Exception e) {
-            logger.error("feign处理异常错误", e);
-            return statusException;
-        }
-    }
 
 }

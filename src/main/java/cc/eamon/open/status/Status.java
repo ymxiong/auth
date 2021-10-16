@@ -134,6 +134,11 @@ public class Status {
         return new Builder(true, StatusCode.getCode(200), StatusCode.getMessage(200));
     }
 
+    public static Builder successFailedInnerBuilder(String message) {
+        return new Builder(true, StatusCode.getCode(200), message);
+    }
+
+
     public static Builder failedBuilder() {
         return new Builder(false, StatusCode.getCode(700), StatusCode.getMessage(700));
     }

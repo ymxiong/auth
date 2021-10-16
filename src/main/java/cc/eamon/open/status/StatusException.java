@@ -13,6 +13,8 @@ public class StatusException extends RuntimeException {
 
     private String detail;
 
+    private boolean setResponseStatus = true;
+
     public StatusException(String errorName) {
         super(StatusCode.getMessage(errorName));
         this.code = StatusCode.getCode(errorName);
@@ -64,5 +66,29 @@ public class StatusException extends RuntimeException {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public boolean isSetResponseStatus() {
+        return setResponseStatus;
+    }
+
+    public void setSetResponseStatus(boolean setResponseStatus) {
+        this.setResponseStatus = setResponseStatus;
+    }
+
+    /**
+     * 用于不修改状态码(保持为200)，将错误包在message中透传到前端
+     */
+    public void setStatusInner() {
+        this.setResponseStatus = false;
+    }
+
+    @Override
+    public String toString() {
+        return "StatusException{" +
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", detail='" + detail + '\'' +
+                '}';
     }
 }
