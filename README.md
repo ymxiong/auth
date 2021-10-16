@@ -342,10 +342,7 @@ public class AuthAdvice extends cc.eamon.open.auth.advice.AuthAdvice {
         return request.getParameter(valueName);
     }
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/dev_zyh
 ```
 
 #### 注意点
@@ -388,10 +385,7 @@ public class StatusAdvice extends cc.eamon.open.status.StatusAdvice {
     }
 
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/dev_zyh
 ```
 
 用于全局异常处理，跨服务异常传递
