@@ -1,8 +1,7 @@
 # Auth中间件
 ## Auth 版本
 
-master版本0.1.3
-
+master版本0.1.4
 ## Auth中间件概述
 
 Auth中间件以分布式系统统一鉴权与链路信息管理为核心，目前主要包含以下模块：
@@ -343,6 +342,10 @@ public class AuthAdvice extends cc.eamon.open.auth.advice.AuthAdvice {
         return request.getParameter(valueName);
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/dev_zyh
 ```
 
 #### 注意点
@@ -385,6 +388,10 @@ public class StatusAdvice extends cc.eamon.open.status.StatusAdvice {
     }
 
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/dev_zyh
 ```
 
 用于全局异常处理，跨服务异常传递
@@ -433,7 +440,9 @@ ChainContext
 
 ## Status模块
 
-错误统一管理，在每个服务内部common模块下status.json中进行错误定制和统一管理，包含以下默认错误，定制错误对数组进行扩展即可：
+### 错误统一管理
+
+在每个服务内部common模块下status.json中进行错误定制和统一管理，包含以下默认错误，定制错误对数组进行扩展即可：
 
 ```json
 {
@@ -480,6 +489,275 @@ ChainContext
       "message": "链路转化错误"
     }
   ]
+}
+
+```
+
+### 跨服务异常信息定制
+
+*version 0.1.4 新增*
+
+#### maven依赖
+
+须在domain module新增如下maven依赖：
+
+```xml
+<dependency>
+		<groupId>cc.eamon.open</groupId>
+    <artifactId>auth</artifactId>
+    <version>0.1.4</version>
+  	<scope>provided</scope>
+</dependency>
+```
+
+#### 注解
+
+##### @ErrorHandler——异常定制接口方法
+
+用于注解需要定制异常信息的feign申明接口，即被@FeignClient注解的接口中的具体方法
+
+```java
+package cc.eamon.open.status.codec;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ErrorHandler {
+
+    ErrorInstance[] instances() default {};
+
+}
+
+```
+
+##### @ErrorInstance——异常定制实例
+
+用于注解申明具体接口对应错误码的定制异常信息，包含：
+
++ id：对齐status.json中的错误id
++ statusCode：对应当前定制接口方法的具体错误码
++ message：指明当前接口在该错误码下的定制错误信息
++ decodeException：指明当前接口在该错误码下的定制错误类型
+
+```java
+package cc.eamon.open.status.codec;
+
+import cc.eamon.open.status.StatusException;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ErrorInstance {
+
+    String id() default "NO_RECOGNIZE_MSG";
+
+    int statusCode() default 701;
+
+    String message() default "rpc error";
+
+    Class<? extends Exception> decodeException() default StatusException.class;
+}
+
+```
+
+#### 使用示例
+
+```java
+package com.horsecoder.storage.domain;
+
+import cc.eamon.open.status.StatusException;
+import cc.eamon.open.status.codec.ErrorHandler;
+import cc.eamon.open.status.codec.ErrorInstance;
+import com.horsecoder.storage.config.FeignMultipartConfig;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Map;
+
+
+@FeignClient(
+        value = "horsecoder-storage",
+        path = "/facade/storage/file",
+        configuration = FeignMultipartConfig.class
+)
+public interface FileUpdateCoreFacade {
+
+
+    @ErrorHandler(
+            instances = {
+                    @ErrorInstance(
+                            id = "DIY1",
+                            statusCode = 1001,
+                            message = "diy1",
+                            decodeException = StatusException.class),
+                    @ErrorInstance(
+                            id = "DIY2",
+                            statusCode = 1002,
+                            message = "diy2",
+                            decodeException = RuntimeException.class
+                    )
+            }
+    )
+    @RequestMapping(
+            value = "upload/json",
+            method = RequestMethod.POST,
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    String uploadJsonFile(
+            @RequestPart MultipartFile file,
+            @RequestParam(value = "placeholder", required = false) String placeholder,
+            @RequestParam(value = "user", required = true) String user,
+            @RequestParam(value = "fileName", required = false) String fileName
+    );
+
+}
+```
+
+如上所示进行接口异常信息定制，当该接口返回异常code为1001时，将会在调用方解析为：
+
+```java
+new StatusException(1001, "diy2");
+```
+
+#### 其他变更
+
+异常对象默认为支持跨服务传递，并且在0.1.4版本与状态码解耦，为支持状态码为200但实际内含异常的情况，并且由StatusException对象setResponseStatus属性决定是否进行跨服务状态变更（默认总是进行跨服务状态覆盖）
+
+若须使用特殊情况，即不对跨服务状态进行覆盖，则以当前异常对象为粒度将setResponseStatus属性置为false
+
+##### StatusException
+
+```java
+package cc.eamon.open.status;
+
+
+public class StatusException extends RuntimeException {
+
+    private int code;
+
+    private String message;
+
+    private String detail;
+
+    private boolean setResponseStatus = true; // 默认进行跨服务状态覆盖
+
+    public StatusException(String errorName) {
+        super(StatusCode.getMessage(errorName));
+        this.code = StatusCode.getCode(errorName);
+        this.message = super.getMessage();
+        this.detail = "";
+    }
+
+    public StatusException(String errorName, String detail) {
+        super(StatusCode.getMessage(errorName));
+        this.code = StatusCode.getCode(errorName);
+        this.message = super.getMessage();
+        this.detail = detail;
+    }
+
+    public StatusException(int code, String message) {
+        super(message);
+        this.code = code;
+        this.message = message;
+        this.detail = "";
+    }
+
+    public StatusException(int code, String message, String detail) {
+        super(message);
+        this.code = code;
+        this.message = message;
+        this.detail = detail;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    @Override
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public boolean isSetResponseStatus() {
+        return setResponseStatus;
+    }
+
+    public void setSetResponseStatus(boolean setResponseStatus) {
+        this.setResponseStatus = setResponseStatus;
+    }
+
+    /**
+     * 用于不修改状态码(保持为200)，将错误包在message中透传到前端
+     */
+    public void setStatusInner() {
+        this.setResponseStatus = false;
+    }
+
+    @Override
+    public String toString() {
+        return "StatusException{" +
+                "code=" + code +
+                ", message='" + message + '\'' +
+                ", detail='" + detail + '\'' +
+                '}';
+    }
+}
+
+```
+
+同时该值与全局跨服务异常状态覆盖开关（StatusAdvice）取或关系：
+
+setResponseStatus() || StatusException.setResponseStatus为最终结果
+
+```java
+@ControllerAdvice
+public class StatusAdvice extends cc.eamon.open.status.StatusAdvice {
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+    }
+
+    /**
+     * 全局异常处理
+     */
+    @ExceptionHandler(value = {Exception.class})
+    @ResponseBody
+    @Override
+    public Map<String, Object> statusExceptionHandler(HttpServletRequest request, HttpServletResponse response, Exception e) {
+        return super.statusExceptionHandler(request, response, e);
+    }
+
+    // 全局跨服务异常状态覆盖开关
+    @Override
+    public boolean setResponseStatus() {
+        return false;
+    }
+
 }
 ```
 
