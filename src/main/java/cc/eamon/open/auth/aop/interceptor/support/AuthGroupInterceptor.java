@@ -42,6 +42,8 @@ public class AuthGroupInterceptor extends BaseAnnotationMethodInterceptor {
         String[] groups = authAnnotation.value();
         Logical[] logicalList = authAnnotation.logical();
 
+        if (groups == null || groups.length == 0) return;
+
         boolean result = authenticator.checkGroup(request, response, uri, groups[0]);
         if (groups.length > 1) {
             for (int i = 1; i < groups.length; i++) {

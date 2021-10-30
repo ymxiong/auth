@@ -13,7 +13,7 @@ public interface MethodInterceptor {
 
     Object invoke(MethodInvocation invocation) throws Throwable;
 
-    void assertAuthorized(MethodInvocation methodInvocation);
+    void assertAuthorized(MethodInvocation methodInvocation) throws Exception;
 
     boolean supports(MethodInvocation methodInvocation);
 

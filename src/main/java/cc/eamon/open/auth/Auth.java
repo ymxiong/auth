@@ -1,5 +1,8 @@
 package cc.eamon.open.auth;
 
+import cc.eamon.open.auth.advice.AuthAdvice;
+import cc.eamon.open.auth.authenticator.Authenticator;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,5 +30,12 @@ public @interface Auth {
      * @return 鉴权规则and/or
      */
     Logical[] logical() default Logical.AND;
+
+    /**
+     * 自定义鉴权器Class
+     * 用于注入自定义鉴权，供回调使用
+     * @return
+     */
+    Class<? extends Authenticator> authenticatorClass() default AuthAdvice.class;
 
 }

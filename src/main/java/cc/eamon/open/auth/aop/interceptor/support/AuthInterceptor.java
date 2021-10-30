@@ -3,6 +3,7 @@ package cc.eamon.open.auth.aop.interceptor.support;
 
 import cc.eamon.open.auth.Auth;
 import cc.eamon.open.auth.Logical;
+import cc.eamon.open.auth.advice.AuthAdvice;
 import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
 import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
 import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
@@ -33,13 +34,13 @@ public class AuthInterceptor extends BaseAnnotationMethodInterceptor {
     }
 
     @Override
-    public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) {
+    public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) throws Exception {
         if (!(annotation instanceof Auth)) return;
+        Auth authAnnotation = (Auth) annotation;
         Authenticator authenticator = AuthenticatorHolder.get();
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
         if (!authenticator.open(request, response)) return;
-        Auth authAnnotation = (Auth) annotation;
         logicalQueue.add(Logical.AND);
         logicalQueue.addAll(Arrays.asList(authAnnotation.logical()));
     }

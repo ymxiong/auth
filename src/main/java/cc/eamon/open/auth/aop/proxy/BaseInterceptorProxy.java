@@ -21,22 +21,16 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
 
     private ThreadLocal<Collection<MethodInterceptor>> methodInterceptors = null;
 
-    private Authenticator authenticator;
-
-    public BaseInterceptorProxy(Authenticator authenticator) {
-        this.authenticator = authenticator;
-    }
-
     @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
-        AuthenticatorHolder.set(authenticator);
         this.assertAuthorized(methodInvocation);
         this.clearMethodInterceptors();
+        AuthenticatorHolder.clear();
         return methodInvocation.proceed();
     }
 
     @Override
-    public void assertAuthorized(MethodInvocation methodInvocation) {
+    public void assertAuthorized(MethodInvocation methodInvocation) throws Exception {
         if (CollectionUtils.isEmpty(methodInterceptors.get())) return;
 
         for (MethodInterceptor interceptor : methodInterceptors.get()) {

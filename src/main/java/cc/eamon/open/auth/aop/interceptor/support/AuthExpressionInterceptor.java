@@ -47,6 +47,8 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
         String[] expressions = authAnnotation.value();
         Logical[] logicalList = authAnnotation.logical();
 
+        if (expressions == null || expressions.length == 0) return;
+
         boolean result = checkExpression(expressions[0], authenticator, request, response);
         if (expressions.length > 1) {
             for (int i = 1; i < expressions.length; i++) {
