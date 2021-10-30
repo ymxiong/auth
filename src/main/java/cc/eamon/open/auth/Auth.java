@@ -32,6 +32,7 @@ public @interface Auth {
     Logical[] logical() default Logical.AND;
 
     /**
+     * @since 0.1.5
      * 自定义鉴权器Class
      * 用于注入自定义鉴权，供回调使用
      * @return
