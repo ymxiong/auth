@@ -1,5 +1,6 @@
 package cc.eamon.open.auth.authenticator.support;
 
+import cc.eamon.open.auth.advice.AuthAdvice;
 import cc.eamon.open.auth.authenticator.Authenticator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +11,11 @@ import javax.servlet.http.HttpServletResponse;
  * Email: eamon@eamon.cc
  * Time: 2020-10-17 01:20:17
  */
-public class DefaultAuthenticator implements Authenticator {
+public class DefaultAuthenticator extends AuthAdvice implements Authenticator {
+
+    public DefaultAuthenticator() {
+        super();
+    }
 
     @Override
     public boolean open(HttpServletRequest request, HttpServletResponse response) {
@@ -29,12 +34,12 @@ public class DefaultAuthenticator implements Authenticator {
 
     @Override
     public Object getContextValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
-        return null;
+        return super.getContextValue(request, response, valueName);
     }
 
     @Override
     public Object getRequestValue(HttpServletRequest request, HttpServletResponse response, String valueName) {
-        return null;
+        return super.getRequestValue(request, response, valueName);
     }
 
 }

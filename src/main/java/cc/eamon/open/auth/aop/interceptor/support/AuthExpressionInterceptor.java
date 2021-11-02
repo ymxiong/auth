@@ -67,8 +67,6 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
     private boolean checkExpression(String expressionString, Authenticator authenticator, HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
         if (StringUtils.isEmpty(expressionString)) return true;
-        // TODO:
-        //表达式校验问题
         try {
             Expression expression = AviatorEvaluator.compile(expressionString);
             List<String> variableNames = expression.getVariableNames();
