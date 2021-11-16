@@ -6,7 +6,7 @@
 
     <groupId>cc.eamon.open</groupId>
     <artifactId>auth</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
