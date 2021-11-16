@@ -23,13 +23,13 @@ public class DefaultAuthenticator extends AuthAdvice implements Authenticator {
     }
 
     @Override
-    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group) {
-        return true;
+    public <Body> boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
+        return super.checkGroup(request, response, uri, group, body);
     }
 
     @Override
-    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult) {
-        return expressionResult;
+    public <Body> boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
+        return super.checkExpression(request, response, uri, expression, expressionResult, body);
     }
 
     @Override

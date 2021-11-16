@@ -43,12 +43,12 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     }
 
     @Override
-    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group) {
+    public <Body> boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
         return true;
     }
 
     @Override
-    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult) {
+    public <Body> boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
         return true;
     }
 

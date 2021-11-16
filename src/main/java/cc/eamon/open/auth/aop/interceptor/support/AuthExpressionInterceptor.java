@@ -1,6 +1,7 @@
 package cc.eamon.open.auth.aop.interceptor.support;
 
 
+import cc.eamon.open.Constant;
 import cc.eamon.open.auth.AuthExpression;
 import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
@@ -8,6 +9,7 @@ import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
 import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
+import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.error.Assert;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
@@ -67,12 +69,15 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
     private boolean checkExpression(String expressionString, Authenticator authenticator, HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
         if (StringUtils.isEmpty(expressionString)) return true;
+        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_OBJECT_KEY);
+        Class objectClass = (Class) ChainContextHolder.get(Constant.REQUEST_BODY_CLASS_KEY);
         try {
             Expression expression = AviatorEvaluator.compile(expressionString);
             List<String> variableNames = expression.getVariableNames();
             String a2 = null;
-            if (variableNames.size() > 1)
+            if (variableNames.size() > 1) {
                 a2 = variableNames.get(1);
+            }
             String a1 = variableNames.get(0);
 
             Object requestValue = authenticator.getRequestValue(request, response, a1);
@@ -82,9 +87,9 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
             env.put(a1, requestValue);
             env.put(a2, contextValue);
             boolean innerExecute = (Boolean) expression.execute(env) && (requestValue != null || contextValue != null);
-            return authenticator.checkExpression(request, response, uri, expressionString, innerExecute);
+            return authenticator.checkExpression(request, response, uri, expressionString, innerExecute, body);
         } catch (Exception e) {
-            return authenticator.checkExpression(request, response, uri, expressionString, false);
+            return authenticator.checkExpression(request, response, uri, expressionString, false, body);
         }
     }
 

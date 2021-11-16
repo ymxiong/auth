@@ -1,8 +1,8 @@
 package cc.eamon.open.spring;
 
 import cc.eamon.open.auth.advice.AuthAdvice;
+import cc.eamon.open.auth.aop.deserializer.AuthRequestBodyAdvice;
 import cc.eamon.open.auth.authenticator.support.DefaultAuthenticator;
-import cc.eamon.open.chain.ChainContextAdvice;
 import cc.eamon.open.status.codec.spring.StatusAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -22,5 +22,10 @@ public class AuthAutoConfiguration {
     @Bean
     public AuthAdvice authAdvice() {
         return new DefaultAuthenticator();
+    }
+
+    @Bean
+    public AuthRequestBodyAdvice authRequestBodyAdvice() {
+        return new AuthRequestBodyAdvice();
     }
 }

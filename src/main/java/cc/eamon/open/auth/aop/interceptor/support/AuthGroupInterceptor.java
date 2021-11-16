@@ -1,6 +1,7 @@
 package cc.eamon.open.auth.aop.interceptor.support;
 
 
+import cc.eamon.open.Constant;
 import cc.eamon.open.auth.AuthGroup;
 import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
@@ -8,6 +9,7 @@ import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
 import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
+import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.error.Assert;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -44,15 +46,17 @@ public class AuthGroupInterceptor extends BaseAnnotationMethodInterceptor {
 
         if (groups == null || groups.length == 0) return;
 
-        boolean result = authenticator.checkGroup(request, response, uri, groups[0]);
+        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_OBJECT_KEY);
+        Class objectClass = (Class) ChainContextHolder.get(Constant.REQUEST_BODY_CLASS_KEY);
+        boolean result = authenticator.checkGroup(request, response, uri, groups[0], body);
         if (groups.length > 1) {
             for (int i = 1; i < groups.length; i++) {
                 Logical logical = logicalList[0];
                 if (logicalList.length > i - 1 && logicalList[i - 1] != null) logical = logicalList[i - 1];
                 if (logical == Logical.AND)
-                    result = result && authenticator.checkGroup(request, response, uri, groups[i]);
+                    result = result && authenticator.checkGroup(request, response, uri, groups[i], body);
                 if (logical == Logical.OR)
-                    result = result || authenticator.checkGroup(request, response, uri, groups[i]);
+                    result = result || authenticator.checkGroup(request, response, uri, groups[i], body);
             }
         }
         Assert.isTrue(result, "NO_AUTH");
