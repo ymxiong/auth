@@ -2,6 +2,7 @@ package cc.eamon.open.auth.advice;
 
 import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.advice.strategy.ContextValueStrategyEnums;
+import cc.eamon.open.auth.aop.deserializer.model.Body;
 import cc.eamon.open.auth.aop.proxy.support.AuthMethodInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
@@ -43,12 +44,12 @@ public abstract class AuthAdvice extends StaticMethodMatcherPointcutAdvisor impl
     }
 
     @Override
-    public <Body> boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
+    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
         return true;
     }
 
     @Override
-    public <Body> boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
         return true;
     }
 

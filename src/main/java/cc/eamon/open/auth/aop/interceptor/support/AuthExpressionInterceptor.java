@@ -4,6 +4,7 @@ package cc.eamon.open.auth.aop.interceptor.support;
 import cc.eamon.open.Constant;
 import cc.eamon.open.auth.AuthExpression;
 import cc.eamon.open.auth.Logical;
+import cc.eamon.open.auth.aop.deserializer.model.support.PostBody;
 import cc.eamon.open.auth.aop.interceptor.BaseAnnotationMethodInterceptor;
 import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
 import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
@@ -69,8 +70,12 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
     private boolean checkExpression(String expressionString, Authenticator authenticator, HttpServletRequest request, HttpServletResponse response) {
         String uri = request.getRequestURI();
         if (StringUtils.isEmpty(expressionString)) return true;
+        PostBody postBody = null;
         Object body = ChainContextHolder.get(Constant.REQUEST_BODY_OBJECT_KEY);
         Class objectClass = (Class) ChainContextHolder.get(Constant.REQUEST_BODY_CLASS_KEY);
+        if (body != null && objectClass != null) {
+            postBody = new PostBody(body, objectClass);
+        }
         try {
             Expression expression = AviatorEvaluator.compile(expressionString);
             List<String> variableNames = expression.getVariableNames();
@@ -87,9 +92,9 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
             env.put(a1, requestValue);
             env.put(a2, contextValue);
             boolean innerExecute = (Boolean) expression.execute(env) && (requestValue != null || contextValue != null);
-            return authenticator.checkExpression(request, response, uri, expressionString, innerExecute, body);
+            return authenticator.checkExpression(request, response, uri, expressionString, innerExecute, postBody);
         } catch (Exception e) {
-            return authenticator.checkExpression(request, response, uri, expressionString, false, body);
+            return authenticator.checkExpression(request, response, uri, expressionString, false, postBody);
         }
     }
 

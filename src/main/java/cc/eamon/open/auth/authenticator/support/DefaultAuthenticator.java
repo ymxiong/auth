@@ -1,6 +1,7 @@
 package cc.eamon.open.auth.authenticator.support;
 
 import cc.eamon.open.auth.advice.AuthAdvice;
+import cc.eamon.open.auth.aop.deserializer.model.Body;
 import cc.eamon.open.auth.authenticator.Authenticator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +24,12 @@ public class DefaultAuthenticator extends AuthAdvice implements Authenticator {
     }
 
     @Override
-    public <Body> boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
+    public boolean checkGroup(HttpServletRequest request, HttpServletResponse response, String uri, String group, Body body) {
         return super.checkGroup(request, response, uri, group, body);
     }
 
     @Override
-    public <Body> boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
+    public boolean checkExpression(HttpServletRequest request, HttpServletResponse response, String uri, String expression, boolean expressionResult, Body body) {
         return super.checkExpression(request, response, uri, expression, expressionResult, body);
     }
 
