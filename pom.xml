@@ -126,6 +126,13 @@
             <version>0.0.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>cc.eamon.open</groupId>
+            <artifactId>flow-core</artifactId>
+            <version>0.1.23</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>

@@ -1,10 +1,11 @@
 package cc.eamon.open.auth.aop.proxy;
 
 
+import cc.eamon.open.Constant;
 import cc.eamon.open.auth.Logical;
 import cc.eamon.open.auth.aop.interceptor.MethodInterceptor;
-import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
+import cc.eamon.open.chain.ChainContextHolder;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +27,7 @@ public abstract class BaseInterceptorProxy implements MethodInterceptor {
         this.assertAuthorized(methodInvocation);
         this.clearMethodInterceptors();
         AuthenticatorHolder.clear();
+        ChainContextHolder.remove(Constant.REQUEST_BODY_KEY);
         return methodInvocation.proceed();
     }
 

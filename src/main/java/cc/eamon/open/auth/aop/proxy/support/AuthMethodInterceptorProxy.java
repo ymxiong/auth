@@ -3,6 +3,7 @@ package cc.eamon.open.auth.aop.proxy.support;
 import cc.eamon.open.auth.Auth;
 import cc.eamon.open.auth.AuthEnums;
 import cc.eamon.open.auth.advice.AuthAdvice;
+import cc.eamon.open.auth.aop.interceptor.support.AuthResourceInterceptor;
 import cc.eamon.open.auth.aop.proxy.BaseInterceptorProxy;
 import cc.eamon.open.auth.authenticator.Authenticator;
 import cc.eamon.open.auth.authenticator.AuthenticatorHolder;
@@ -10,7 +11,6 @@ import cc.eamon.open.auth.authenticator.support.DefaultAuthenticator;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -26,9 +26,14 @@ public class AuthMethodInterceptorProxy extends BaseInterceptorProxy implements 
     public Object invoke(MethodInvocation invocation) throws Throwable {
         cc.eamon.open.auth.aop.interceptor.MethodInterceptor interceptor = null;
         boolean authPresent = false;
+        boolean authResourcePresent = false;
         for (Annotation annotation : invocation.getMethod().getAnnotations()) {
             AuthEnums authEnum = AuthEnums.getEnumByAnnotationClass(annotation);
             if (authEnum == null) continue;
+            if (authEnum == AuthEnums.AUTH_RESOURCE) {
+                authResourcePresent = true;
+                continue;
+            }
             // 动态设置Authenticator，兼容之前逻辑
             if (authEnum == AuthEnums.AUTH_DEFAULT) {
                 authPresent = true;
@@ -43,6 +48,10 @@ public class AuthMethodInterceptorProxy extends BaseInterceptorProxy implements 
             Constructor constructor = authEnum.getMethodInterceptor().getDeclaredConstructor(cc.eamon.open.auth.aop.interceptor.MethodInterceptor.class);
             constructor.setAccessible(true);
             interceptor = (cc.eamon.open.auth.aop.interceptor.MethodInterceptor) constructor.newInstance(interceptor);
+        }
+        // make sure auth resource always last
+        if (authResourcePresent) {
+            interceptor = AuthResourceInterceptor.class.getDeclaredConstructor(cc.eamon.open.auth.aop.interceptor.MethodInterceptor.class).newInstance(interceptor);
         }
         this.addMethodInterceptors(interceptor);
         if (!authPresent) {
