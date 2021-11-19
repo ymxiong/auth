@@ -71,10 +71,9 @@ public class AuthExpressionInterceptor extends BaseAnnotationMethodInterceptor {
         String uri = request.getRequestURI();
         if (StringUtils.isEmpty(expressionString)) return true;
         PostBody postBody = null;
-        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_OBJECT_KEY);
-        Class objectClass = (Class) ChainContextHolder.get(Constant.REQUEST_BODY_CLASS_KEY);
-        if (body != null && objectClass != null) {
-            postBody = new PostBody(body, objectClass);
+        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_KEY);
+        if (body != null) {
+            postBody = (PostBody) body;
         }
         try {
             Expression expression = AviatorEvaluator.compile(expressionString);

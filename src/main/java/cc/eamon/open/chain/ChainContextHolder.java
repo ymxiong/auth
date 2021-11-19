@@ -51,4 +51,8 @@ public class ChainContextHolder {
         ChainContextHolder.get().put(chainKeyEnum.getKey(), value);
     }
 
+    public static void remove(String key) {
+        get().remove(key);
+    }
+
 }

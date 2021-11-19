@@ -1,6 +1,8 @@
 package cc.eamon.open.auth.aop.deserializer;
 
 import cc.eamon.open.Constant;
+import cc.eamon.open.auth.aop.deserializer.model.Body;
+import cc.eamon.open.auth.aop.deserializer.model.support.PostBody;
 import cc.eamon.open.chain.ChainContextHolder;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpInputMessage;
@@ -37,14 +39,14 @@ public class AuthRequestBodyAdvice extends RequestBodyAdviceAdapter {
             try {
                 typeClass = (Class) targetType;
                 if (body.getClass() == typeClass || typeClass.isAssignableFrom(body.getClass())) {
-                    ChainContextHolder.put(Constant.REQUEST_BODY_OBJECT_KEY, body);
-                    ChainContextHolder.put(Constant.REQUEST_BODY_CLASS_KEY, typeClass);
+                    Body requestBody = new PostBody(body, typeClass);
+                    ChainContextHolder.put(Constant.REQUEST_BODY_KEY, requestBody);
                 }
             } catch (Exception e) {
                 String className = body.getClass().getName();
                 if (!StringUtils.isEmpty(className) && className.equals(targetType.getTypeName())) {
-                    ChainContextHolder.put(Constant.REQUEST_BODY_OBJECT_KEY, body);
-                    ChainContextHolder.put(Constant.REQUEST_BODY_CLASS_KEY, body.getClass());
+                    Body requestBody = new PostBody(body, body.getClass());
+                    ChainContextHolder.put(Constant.REQUEST_BODY_KEY, requestBody);
                 }
             }
         }

@@ -7,7 +7,12 @@ package cc.eamon.open;
  **/
 public class Constant {
 
-    public static final String REQUEST_BODY_OBJECT_KEY = "REQUEST_BODY_OBJECT";
+    public static final String REQUEST_BODY_KEY = "REQUEST_BODY";
 
-    public static final String REQUEST_BODY_CLASS_KEY = "REQUEST_BODY_CLASS";
+    public static final String AUTH_FLOW_RESULT_KEY = "AUTH_FLOW_RESULT";
+
+    public static final String AUTH_FLOW_REQUEST_KEY = "AUTH_FLOW_REQUEST";
+
+    public static final String AUTH_FLOW_MAP_KEY = "AUTH_FLOW_MAP";
+
 }

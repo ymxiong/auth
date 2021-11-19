@@ -48,10 +48,9 @@ public class AuthGroupInterceptor extends BaseAnnotationMethodInterceptor {
         if (groups == null || groups.length == 0) return;
 
         PostBody postBody = null;
-        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_OBJECT_KEY);
-        Class objectClass = (Class) ChainContextHolder.get(Constant.REQUEST_BODY_CLASS_KEY);
-        if (body != null && objectClass != null) {
-            postBody = new PostBody(body, objectClass);
+        Object body = ChainContextHolder.get(Constant.REQUEST_BODY_KEY);
+        if (body != null) {
+            postBody = (PostBody) body;
         }
         boolean result = authenticator.checkGroup(request, response, uri, groups[0], postBody);
         if (groups.length > 1) {
