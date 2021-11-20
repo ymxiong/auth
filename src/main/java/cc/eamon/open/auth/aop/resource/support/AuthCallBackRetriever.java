@@ -3,6 +3,8 @@ package cc.eamon.open.auth.aop.resource.support;
 import cc.eamon.open.auth.aop.resource.ResourceRetrieveType;
 import cc.eamon.open.auth.aop.resource.ResourceRetriever;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Author: Zhu yuhan
  * Email: zhuyuhan2333@qq.com
@@ -11,7 +13,7 @@ import cc.eamon.open.auth.aop.resource.ResourceRetriever;
 public class AuthCallBackRetriever implements ResourceRetriever {
 
     @Override
-    public boolean retrieve(String expression) {
+    public boolean retrieve(String expression, HttpServletRequest request) {
         return true;
     }
 

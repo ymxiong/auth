@@ -3,6 +3,7 @@ package cc.eamon.open.auth.aop.resource.support;
 import cc.eamon.open.Constant;
 import cc.eamon.open.auth.aop.resource.ResourceRetrieveType;
 import cc.eamon.open.auth.aop.resource.ResourceRetriever;
+import cc.eamon.open.auth.util.AuthUtils;
 import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.flow.config.constants.FlowConstants;
 import cc.eamon.open.flow.core.FlowEngine;
@@ -12,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ import java.util.Map;
 public class AuthFlowRetriever implements ResourceRetriever {
 
     @Override
-    public boolean retrieve(String expression) {
+    public boolean retrieve(String expression, HttpServletRequest request) {
         if (StringUtils.isEmpty(expression))
             return false;
         FlowEngine flowEngine = FlowEngine.instance();
@@ -32,12 +34,12 @@ public class AuthFlowRetriever implements ResourceRetriever {
             if (split.length < 2) return false;
             String flowId = split[1];
             Map<String, Object> params = new HashMap<>();
-            Object bodyObj = ChainContextHolder.get(Constant.REQUEST_BODY_KEY);
-            if (bodyObj == null) {
+            Map<String, Object> bodyMap = AuthUtils.getRequestBodyMap();
+            if (bodyMap == null || bodyMap.isEmpty()) {
                 // get or delete
-                params.put(Constant.AUTH_FLOW_REQUEST_KEY, ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest());
+                params.put(Constant.AUTH_FLOW_REQUEST_KEY, request);
             } else {
-                params.put(Constant.AUTH_FLOW_MAP_KEY, JSON.parseObject(JSON.toJSONString(bodyObj)));
+                params.put(Constant.AUTH_FLOW_MAP_KEY, bodyMap);
             }
             params.forEach((key, value) -> flowEngine.register(FlowConstants.SCOPE_DEFAULT, key, value));
             flowEngine.run(flowId);

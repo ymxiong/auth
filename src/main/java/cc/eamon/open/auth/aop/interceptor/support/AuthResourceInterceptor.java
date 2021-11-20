@@ -9,7 +9,10 @@ import cc.eamon.open.auth.aop.resource.ResourceRetrieverEnum;
 import cc.eamon.open.auth.aop.resolver.support.SpringAnnotationResolver;
 import cc.eamon.open.error.Assert;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 
 /**
@@ -26,6 +29,7 @@ public class AuthResourceInterceptor extends BaseAnnotationMethodInterceptor {
     @Override
     public void assertAuthorized(MethodInvocation methodInvocation, Annotation annotation) throws Exception {
         if (!(annotation instanceof AuthResource)) return;
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         AuthResource authResource = (AuthResource) annotation;
         String[] values = authResource.value();
         Logical[] logicalList = authResource.logical();
@@ -33,7 +37,7 @@ public class AuthResourceInterceptor extends BaseAnnotationMethodInterceptor {
 
         if (values == null || values.length == 0) return;
 
-        boolean result = ResourceRetrieverEnum.getRetriever(resourceRetrieveTypes[0]).retrieve(values[0]);
+        boolean result = ResourceRetrieverEnum.getRetriever(resourceRetrieveTypes[0]).retrieve(values[0], request);
 
         if (values.length > 1) {
             for (int i = 1; i < values.length; i++) {
@@ -43,9 +47,9 @@ public class AuthResourceInterceptor extends BaseAnnotationMethodInterceptor {
                 if (resourceRetrieveTypes.length > i - 1 && resourceRetrieveTypes[i - 1] != null)
                     resourceRetrieveType = resourceRetrieveTypes[i - 1];
                 if (logical == Logical.AND)
-                    result = result && ResourceRetrieverEnum.getRetriever(resourceRetrieveType).retrieve(values[i]);
+                    result = result && ResourceRetrieverEnum.getRetriever(resourceRetrieveType).retrieve(values[i], request);
                 if (logical == Logical.OR)
-                    result = result || ResourceRetrieverEnum.getRetriever(resourceRetrieveType).retrieve(values[i]);
+                    result = result || ResourceRetrieverEnum.getRetriever(resourceRetrieveType).retrieve(values[i], request);
             }
         }
         Assert.isTrue(result, "NO_AUTH");
