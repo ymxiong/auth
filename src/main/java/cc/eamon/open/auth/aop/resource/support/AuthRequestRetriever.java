@@ -24,7 +24,7 @@ public class AuthRequestRetriever extends AuthResourceRetrieverAdapter {
         }
         Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
         if (authContextMap == null || authContextMap.isEmpty() || authContextMap.get("body") == null) return false;
-        Object value = (JSON.parseObject(JSON.toJSONString(authContextMap.get("body")))).get((expression));
+        Object value = (JSON.parseObject(JSON.toJSONString(authContextMap.get("body")))).get(expression);
         if (value != null) {
             reserve(expression, value);
             return true;
