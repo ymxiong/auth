@@ -38,4 +38,12 @@ public @interface AuthResource {
      */
     ResourceRetrieveType[] retrieveTypes() default ResourceRetrieveType.REQUEST;
 
+    /**
+     * 是否保留
+     * 用于整条鉴权链路使用
+     *
+     * @return
+     */
+    boolean[] reserve() default false;
+
 }

@@ -1,8 +1,8 @@
 package cc.eamon.open.auth.aop.resource.support;
 
 import cc.eamon.open.Constant;
+import cc.eamon.open.auth.aop.resource.AuthResourceRetrieverAdapter;
 import cc.eamon.open.auth.aop.resource.ResourceRetrieveType;
-import cc.eamon.open.auth.aop.resource.ResourceRetriever;
 import cc.eamon.open.auth.util.AuthUtils;
 import cc.eamon.open.flow.config.constants.FlowConstants;
 import cc.eamon.open.flow.core.FlowEngine;
@@ -17,7 +17,7 @@ import java.util.Map;
  * Email: zhuyuhan2333@qq.com
  * Date: 2021/11/19 7:07 下午
  **/
-public class AuthFlowRetriever implements ResourceRetriever {
+public class AuthFlowRetriever extends AuthResourceRetrieverAdapter {
 
     @Override
     public boolean retrieve(String expression, HttpServletRequest request) {
@@ -29,12 +29,12 @@ public class AuthFlowRetriever implements ResourceRetriever {
             if (split.length < 2) return false;
             String flowId = split[1];
             Map<String, Object> params = new HashMap<>();
-            Map<String, Object> bodyMap = AuthUtils.getRequestBodyMap();
-            if (bodyMap == null || bodyMap.isEmpty()) {
+            Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
+            if (authContextMap == null || authContextMap.isEmpty() || ((Map)authContextMap.get("extra")).isEmpty()) {
                 // get or delete
                 params.put(Constant.AUTH_FLOW_REQUEST_KEY, request);
             } else {
-                params.put(Constant.AUTH_FLOW_MAP_KEY, bodyMap);
+                params.put(Constant.AUTH_FLOW_MAP_KEY, authContextMap);
             }
             params.forEach((key, value) -> flowEngine.register(FlowConstants.SCOPE_DEFAULT, key, value));
             flowEngine.run(flowId);

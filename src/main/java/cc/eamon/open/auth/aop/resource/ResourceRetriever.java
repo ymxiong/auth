@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
  **/
 public interface ResourceRetriever {
 
-    boolean retrieve(String expression, HttpServletRequest request);
+    boolean retrieve(String expression, HttpServletRequest request, boolean reserve);
 
     ResourceRetrieveType type();
 }

@@ -3,9 +3,8 @@ package cc.eamon.open.auth.util;
 import cc.eamon.open.Constant;
 import cc.eamon.open.auth.aop.deserializer.model.Body;
 import cc.eamon.open.chain.ChainContextHolder;
-import com.alibaba.fastjson.JSON;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,9 +14,17 @@ import java.util.Map;
  **/
 public class AuthUtils {
 
-    public static Map<String, Object> getRequestBodyMap() {
+    public static Map<String, Object> getAuthContextMap() {
         Body body = (Body) ChainContextHolder.get(Constant.REQUEST_BODY_KEY);
-        if (body == null) return Collections.emptyMap();
-        return JSON.parseObject(JSON.toJSONString(body));
+        if (body == null) {
+            setAuthContextMap();
+            return ((Body)ChainContextHolder.get(Constant.REQUEST_BODY_KEY)).toMap();
+        }
+        return body.toMap();
+    }
+
+    private static void setAuthContextMap() {
+        Body body = new Body(new HashMap<String, Object>());
+        ChainContextHolder.put(Constant.REQUEST_BODY_KEY, body);
     }
 }
