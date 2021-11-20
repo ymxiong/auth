@@ -44,8 +44,8 @@ public class AuthResourceInterceptor extends BaseAnnotationMethodInterceptor {
                 Logical logical = logicalList[0];
                 ResourceRetrieveType resourceRetrieveType = resourceRetrieveTypes[0];
                 if (logicalList.length > i - 1 && logicalList[i - 1] != null) logical = logicalList[i - 1];
-                if (resourceRetrieveTypes.length > i - 1 && resourceRetrieveTypes[i - 1] != null)
-                    resourceRetrieveType = resourceRetrieveTypes[i - 1];
+                if (resourceRetrieveTypes.length > i && resourceRetrieveTypes[i] != null)
+                    resourceRetrieveType = resourceRetrieveTypes[i];
                 if (logical == Logical.AND)
                     result = result && ResourceRetrieverEnum.getRetriever(resourceRetrieveType).retrieve(values[i], request);
                 if (logical == Logical.OR)
