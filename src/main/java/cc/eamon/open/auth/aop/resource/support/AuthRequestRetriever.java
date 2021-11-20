@@ -3,6 +3,7 @@ package cc.eamon.open.auth.aop.resource.support;
 import cc.eamon.open.auth.aop.resource.AuthResourceRetrieverAdapter;
 import cc.eamon.open.auth.aop.resource.ResourceRetrieveType;
 import cc.eamon.open.auth.util.AuthUtils;
+import com.alibaba.fastjson.JSON;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -22,8 +23,8 @@ public class AuthRequestRetriever extends AuthResourceRetrieverAdapter {
             return true;
         }
         Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
-        if (authContextMap == null || authContextMap.isEmpty()) return false;
-        Object value = authContextMap.get(expression);
+        if (authContextMap == null || authContextMap.isEmpty() || authContextMap.get("body") == null) return false;
+        Object value = (JSON.parseObject(JSON.toJSONString(authContextMap.get("body")))).get((expression));
         if (value != null) {
             reserve(expression, value);
             return true;
