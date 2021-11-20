@@ -1,6 +1,8 @@
 package cc.eamon.open.auth;
 
+import cc.eamon.open.auth.aop.resource.AuthCallback;
 import cc.eamon.open.auth.aop.resource.ResourceRetrieveType;
+import cc.eamon.open.auth.aop.resource.callback.DefaultAuthCallback;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -21,14 +23,7 @@ public @interface AuthResource {
      * 用于根据资源名称自动查询资源以供鉴权：支持表达式
      * @return 资源名称
      */
-    String[] value() default "";
-
-    /**
-     * 鉴权规则
-     * 用于鉴别分组规则
-     * @return 鉴权规则and/or
-     */
-    Logical[] logical() default Logical.AND;
+    String value() default "";
 
     /**
      * 鉴权资源检索方式
@@ -36,7 +31,7 @@ public @interface AuthResource {
      * @see ResourceRetrieveType
      * @return
      */
-    ResourceRetrieveType[] retrieveTypes() default ResourceRetrieveType.REQUEST;
+    ResourceRetrieveType retrieveType() default ResourceRetrieveType.REQUEST;
 
     /**
      * 是否保留
@@ -44,6 +39,14 @@ public @interface AuthResource {
      *
      * @return
      */
-    boolean[] reserve() default false;
+    boolean reserve() default false;
+
+    /**
+     * 回调
+     * 每个鉴权资源系统判断后的钩子函数
+     *
+     * @return
+     */
+    Class<? extends AuthCallback> callback() default DefaultAuthCallback.class;
 
 }

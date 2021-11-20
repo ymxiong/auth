@@ -18,11 +18,11 @@ public class AuthRequestRetriever extends AuthResourceRetrieverAdapter {
     @Override
     public boolean retrieve(String expression, HttpServletRequest request) {
         String parameter = request.getParameter(expression);
+        Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
         if (parameter != null) {
             reserve(expression, parameter);
             return true;
         }
-        Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
         if (authContextMap == null || authContextMap.isEmpty() || authContextMap.get("body") == null) return false;
         Object value = (JSON.parseObject(JSON.toJSONString(authContextMap.get("body")))).get(expression);
         if (value != null) {

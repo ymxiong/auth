@@ -15,9 +15,9 @@ public abstract class AuthResourceRetrieverAdapter implements ResourceRetriever,
     protected boolean reserve;
 
     @Override
-    public boolean retrieve(String expression, HttpServletRequest request, boolean reserve) {
+    public boolean retrieve(String expression, HttpServletRequest request, boolean reserve, AuthCallback callback) {
         this.reserve = reserve;
-        return retrieve(expression, request);
+        return retrieve(expression, request) && withCallback(request, callback);
     }
 
     public abstract boolean retrieve(String expression, HttpServletRequest request);
@@ -28,5 +28,10 @@ public abstract class AuthResourceRetrieverAdapter implements ResourceRetriever,
         if (!this.reserve) return;
         Map<String, Object> extra = (Map<String, Object>) AuthUtils.getAuthContextMap().get("extra");
         extra.put(key, value);
+    }
+
+    private boolean withCallback(HttpServletRequest request, AuthCallback callback) {
+        Map<String, Object> authContextMap = AuthUtils.getAuthContextMap();
+        return callback == null || callback.auth(request, request.getRequestURI(), authContextMap);
     }
 }

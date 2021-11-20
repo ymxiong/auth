@@ -25,5 +25,15 @@ public enum ResourceRetrieveType {
     /**
      * 环境
      */
-    CONTEXT;
+    CONTEXT,
+
+    /**
+     * 表达式
+     */
+    EXPRESSION,
+
+    /**
+     * 角色
+     */
+    GROUP;
 }
