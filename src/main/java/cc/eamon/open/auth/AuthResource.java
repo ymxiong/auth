@@ -19,17 +19,27 @@ import java.lang.annotation.Target;
 public @interface AuthResource {
 
     /**
+     * 资源表达式，用以标识资源的名称或寻找方式
+     * 用于根据资源表达式自动查询资源以供鉴权：支持计算表达式、资源id、flow id
+     *
+     * @return 资源表达式
+     */
+    String value();
+
+    /**
      * 资源名称
-     * 用于根据资源名称自动查询资源以供鉴权：支持表达式
+     * 仅用于指明资源名称
+     *
      * @return 资源名称
      */
-    String value() default "";
+    String name() default "";
 
     /**
      * 鉴权资源检索方式
      * 用于决定检索策略
-     * @see ResourceRetrieveType
+     *
      * @return
+     * @see ResourceRetrieveType
      */
     ResourceRetrieveType retrieveType() default ResourceRetrieveType.REQUEST;
 
