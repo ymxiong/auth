@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.Optional;
 
+import static cc.eamon.open.Constant.CHAIN_START_HEADER;
+
 /**
  * Author: eamon
  * Email: eamon@eamon.cc
@@ -22,11 +24,9 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
 
     private static Logger logger = LoggerFactory.getLogger(ChainContextHandlerInterceptor.class);
 
-    private static final String START_HEADER = "CHAIN-START";
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if (request.getHeader(START_HEADER.toLowerCase()) == null)
+        if (request.getHeader(CHAIN_START_HEADER.toLowerCase()) == null)
             this.startCheck();
         Enumeration<String> headerEnumeration = request.getHeaderNames();
         while (headerEnumeration.hasMoreElements()) {
@@ -64,7 +64,7 @@ public class ChainContextHandlerInterceptor implements HandlerInterceptor {
             }
             chainKeyProcessor.init();
         }
-        ChainContextHolder.put(START_HEADER, "0");
+        ChainContextHolder.put(CHAIN_START_HEADER, "0");
     }
 
 }

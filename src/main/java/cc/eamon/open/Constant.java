@@ -15,4 +15,6 @@ public class Constant {
 
     public static final String AUTH_FLOW_MAP_KEY = "AUTH_FLOW_MAP";
 
+    public static final String CHAIN_START_HEADER = "CHAIN-START";
+
 }

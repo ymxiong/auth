@@ -54,11 +54,6 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
     }
 
 
-    //    //被调用服务调用该方法
-//    protected void parseChainContextHandle(String key1, Class type1, String key2, Class type2, ChainKeyParser chainKeyParser, ChainKeyProcessor chainKeyProcessor){
-//        this.parseChainContext(key1, type1, key2, type2, chainKeyParser);
-//
-//    }
     protected void parseChainContext(String chainKey1, Class type1, String chainKey2, Class type2, ChainKeyParser chainKeyParser) {
         if (ChainKeyEnum.isDefaultChainKey(chainKey1) || ChainKeyEnum.isDefaultChainKey(chainKey2))
             throw new StatusException(727, "can't parse default CHAIN-KEY");
@@ -82,8 +77,12 @@ public abstract class BaseChainContextRequestInterceptor implements RequestInter
         this.parseChainContext(chainKey1, v1.getClass(), chainKey2, type2, chainKeyParser);
     }
 
-    //同一数据类型换名
-
+    /**
+     * 同一数据类型换名
+     *
+     * @param chainKey1
+     * @param chainKey2
+     */
     protected void parseChainContext(String chainKey1, String chainKey2) {
         this.parseChainContext(chainKey1, null, chainKey2, null, null);
     }
