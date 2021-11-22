@@ -1,8 +1,6 @@
 package cc.eamon.open.auth.aop.resource;
 
-import cc.eamon.open.auth.aop.resource.support.AuthCallBackRetriever;
-import cc.eamon.open.auth.aop.resource.support.AuthFlowRetriever;
-import cc.eamon.open.auth.aop.resource.support.AuthRequestRetriever;
+import cc.eamon.open.auth.aop.resource.support.*;
 
 /**
  * Author: Zhu yuhan
@@ -15,7 +13,13 @@ public enum ResourceRetrieverEnum {
 
     REQUEST_RETRIEVER(new AuthRequestRetriever()),
 
-    CALLBACK_RETRIEVER(new AuthCallBackRetriever());
+    CALLBACK_RETRIEVER(new AuthCallBackRetriever()),
+
+    CONTEXT_RETRIEVER(new AuthContextRetriever()),
+
+    EXPRESSION_RETRIEVER(new AuthExpressionRetriever()),
+
+    GROUP_RETRIEVER(new AuthGroupRetriever());
 
     ResourceRetriever resourceRetriever;
 

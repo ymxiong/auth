@@ -20,5 +20,20 @@ public enum ResourceRetrieveType {
     /**
      * 回调
      */
-    CALLBACK;
+    CALLBACK,
+
+    /**
+     * 环境
+     */
+    CONTEXT,
+
+    /**
+     * 表达式
+     */
+    EXPRESSION,
+
+    /**
+     * 角色
+     */
+    GROUP;
 }

@@ -1,5 +1,7 @@
 package cc.eamon.open.auth.aop.resource;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * Author: Zhu yuhan
  * Email: zhuyuhan2333@qq.com
@@ -7,7 +9,7 @@ package cc.eamon.open.auth.aop.resource;
  **/
 public interface ResourceRetriever {
 
-    boolean retrieve(String expression);
+    boolean retrieve(String expression, HttpServletRequest request, boolean reserve, AuthCallback callback);
 
     ResourceRetrieveType type();
 }

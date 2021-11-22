@@ -23,7 +23,7 @@ public enum AuthEnums {
 
     AUTH_EXPRESSION("AUTH_EXPRESSION", AuthExpression.class, AuthExpressionInterceptor.class),
 
-    AUTH_RESOURCE("AUTH_RESOURCE", AuthResource.class, AuthResourceInterceptor.class);
+    AUTH_RESOURCE("AUTH_RESOURCE", AuthResources.class, AuthResourceInterceptor.class);
 
     private String name;
 
