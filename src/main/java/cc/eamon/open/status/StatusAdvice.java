@@ -30,7 +30,7 @@ public abstract class StatusAdvice {
             if (!StringUtils.isEmpty(exception.getDetail())) {
                 logger.error("error detail:" + exception.getDetail());
             }
-            if (exception.isSetResponseStatus() || setResponseStatus()) {
+            if (exception.isSetResponseStatus() && setResponseStatus()) {
                 response.setStatus(exception.getCode());
                 builder = Status.failedBuilder(exception);
             } else {

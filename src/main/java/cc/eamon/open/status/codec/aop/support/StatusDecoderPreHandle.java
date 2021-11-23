@@ -1,14 +1,8 @@
 package cc.eamon.open.status.codec.aop.support;
 
-import cc.eamon.open.chain.ChainContextHolder;
 import cc.eamon.open.status.StatusConstants;
 import cc.eamon.open.status.StatusException;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import feign.Response;
-import feign.Util;
-
-import java.io.IOException;
 
 /**
  * Author: Zhu yuhan
@@ -25,18 +19,19 @@ public class StatusDecoderPreHandle extends StatusBasePreHandle {
 
     @Override
     public void handleExtra(Response response) {
+        // TODO: 2021/11/23 NEED FIX 正常调用返回非Map的情况; 调用方需要接收Response.Body时不能提前操作流
         Response.Body body = response.body();
         String responseMap = null;
         try {
-            responseMap = Util.toString(body.asReader());
-        } catch (IOException e) {
+//            responseMap = Util.toString(body.asReader());
+//            JSONObject responseMapJson = JSON.parseObject(responseMap);
+//            String statusString = responseMapJson.getString(StatusConstants.STATUS_KEY);
+//            // 防止多次解析response
+//            ChainContextHolder.put(StatusConstants.STATUS_KEY, statusString);
+//            String message = responseMapJson.getString(StatusConstants.MESSAGE_KEY);
+//            ChainContextHolder.put(StatusConstants.MESSAGE_KEY, message);
+        } catch (Exception e) {
             // no op
         }
-        JSONObject responseMapJson = JSON.parseObject(responseMap);
-        String statusString = responseMapJson.getString(StatusConstants.STATUS_KEY);
-        // 防止多次解析response
-        ChainContextHolder.put(StatusConstants.STATUS_KEY, statusString);
-        String message = responseMapJson.getString(StatusConstants.MESSAGE_KEY);
-        ChainContextHolder.put(StatusConstants.MESSAGE_KEY, message);
     }
 }
