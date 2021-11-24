@@ -7,8 +7,12 @@ import cc.eamon.open.status.codec.support.StatusDecoder;
 import cc.eamon.open.status.codec.support.StatusErrorDecoder;
 import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
+import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -25,14 +29,17 @@ public class StatusAutoConfiguration {
     @Autowired
     StatusErrorHandler statusErrorHandler;
 
+    @Autowired
+    private ObjectFactory<HttpMessageConverters> messageConverters;
+
     @Bean
     public StatusErrorHandler statusErrorHandler() {
         return new DefaultStatusErrorHandler();
     }
 
     @Bean
-    public Decoder decoder() {
-        return new StatusDecoder(statusErrorHandler);
+    public Decoder feignDecoder() {
+        return new StatusDecoder(new ResponseEntityDecoder(new SpringDecoder(messageConverters)), statusErrorHandler);
     }
 
     @Bean

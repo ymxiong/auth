@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  cc.eamon.open.spring.AuthAutoConfiguration
+  cc.eamon.open.auth.spring.AuthAutoConfiguration, \
+  cc.eamon.open.status.codec.spring.StatusAutoConfiguration
