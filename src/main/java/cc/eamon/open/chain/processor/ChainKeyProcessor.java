@@ -1,6 +1,5 @@
 package cc.eamon.open.chain.processor;
 
-import cc.eamon.open.chain.parser.ChainKeyParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
