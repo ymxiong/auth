@@ -1,6 +1,8 @@
-package cc.eamon.open.status.codec.aop;
+package cc.eamon.open.status.codec.prehandler;
 
 import feign.Response;
+
+import java.lang.reflect.Type;
 
 /**
  * Author: Zhu yuhan
@@ -9,5 +11,5 @@ import feign.Response;
  **/
 public interface DecoderPreHandle {
 
-    void preHandle(Response response);
+    void preHandle(Response response, Type type);
 }

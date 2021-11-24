@@ -21,7 +21,7 @@ public class StatusConstants {
 
     public static final Integer DEFAULT_CODE = 701;
 
-    public static final String DEFAULT_ID = "NO_RECOGNIZE_MSG";
+    public static final String STATUS_DEFAULT_ID = "STATUS_ERROR";
 
     public static final String STATUS_CHAIN_RPC_KEY = "RPC-KEY";
 

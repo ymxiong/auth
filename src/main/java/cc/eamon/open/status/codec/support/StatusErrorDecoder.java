@@ -5,8 +5,8 @@ import cc.eamon.open.chain.processor.ChainKeyEnum;
 import cc.eamon.open.status.StatusConstants;
 import cc.eamon.open.status.codec.ErrorInstance;
 import cc.eamon.open.status.codec.StatusErrorHandler;
-import cc.eamon.open.status.codec.aop.DecoderPreHandle;
-import cc.eamon.open.status.codec.aop.support.StatusErrorDecoderPreHandle;
+import cc.eamon.open.status.codec.prehandler.DecoderPreHandle;
+import cc.eamon.open.status.codec.prehandler.support.StatusErrorDecoderPreHandle;
 import cc.eamon.open.status.util.StatusUtils;
 import feign.Response;
 import feign.codec.ErrorDecoder;
@@ -53,7 +53,7 @@ public class StatusErrorDecoder implements ErrorDecoder {
      */
     @Override
     public Exception decode(String errorMethod, Response response) {
-        this.decoderPreHandle.preHandle(response);
+        this.decoderPreHandle.preHandle(response, Map.class);
         logger.error(this.getErrorDecodeDetailLog(errorMethod, response));
 
         return statusErrorHandler.handle(StatusUtils.generateErrorMethodKey(ChainContextHolder.getString(StatusConstants.STATUS_CHAIN_RPC_KEY), response));
