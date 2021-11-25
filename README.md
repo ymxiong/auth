@@ -250,6 +250,8 @@ public @interface Auth {
 
 须继承`cc.eamon.open.auth.advice.AuthAdvice`
 
+**如须在AuthAdvice中使用@Autowired注入Spring bean，请使用set注入模式，否则会注入失败**
+
 ```java
 @Aspect
 @Component
